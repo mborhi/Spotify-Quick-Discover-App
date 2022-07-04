@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import { connectToDatabase } from "../../../../utils/database";
-import ClientID from '../endpoints.config';
-import ClientSecret from '../endpoints.config';
-import RedirectURI from '../endpoints.config';
+import ClientID from '../../../../endpoints.config';
+import ClientSecret from '../../../../endpoints.config';
+import RedirectURI from '../../../../endpoints.config';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // connect to data base
@@ -14,8 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('cookies: ', cookies);
 
     const code = req.query.code || null;
-    // var state = req.query.state || null;
-    // var storedState = req.cookies ? req.cookies[stateKey] : null;
+
     let params = {
         code: code,
         redirect_uri: process.env.SPOTIFY_AUTH_REDIRECT_URI,
@@ -32,9 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     const data = await response.json();
     console.log('the token : ', await data);
-    // set token in data base
-    db.collection('auth_tokens').insertOne({ token: data.access_token, cookies: cookies.key })
-    // redirect user back to home page
-    res.redirect('/');
+    // redirect user back to home page attaching the token in the url
+    res.redirect('/?access_token=' + data.access_token);
 
 }

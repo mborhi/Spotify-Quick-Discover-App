@@ -1,4 +1,4 @@
-import { Heading } from "@chakra-ui/layout"
+import { Heading } from "@chakra-ui/layout";
 import CollectionDisplay from "../../components/CollectionDisplay";
 
 // fetch genres from backend
