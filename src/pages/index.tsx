@@ -17,18 +17,18 @@ const Index = () => {
   return (
     <Container>
       <Heading as='h3' size='xl' color='teal'>Home</Heading>
-      {loggedIn ?
-        (<HStack>
-          <Button>
-            <Link href="/categories">Categories</Link>
-          </Button>
-          <Button>
-            <Link href="/genres">Genres</Link>
-          </Button>
-        </HStack>
-        ) :
-        <Login />
-      }
+
+      <HStack>
+        <Button>
+          <Link href="/categories">Categories</Link>
+        </Button>
+        <Button>
+          <Link href="/genres">Genres</Link>
+        </Button>
+      </HStack>
+
+      <Login />
+
     </Container>
   );
 }

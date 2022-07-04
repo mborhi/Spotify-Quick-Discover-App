@@ -11,11 +11,6 @@ import {
     Link
 } from '@chakra-ui/react';
 
-type ForgotPasswordFormInputs = {
-    email: string;
-};
-
-
 const Login = () => {
     return (
         <Flex
@@ -41,7 +36,7 @@ const Login = () => {
                     You&apos;ll be redirected to the official Spotify Login
                 </Text>
                 <Stack spacing={6}>
-                    <Link href="http://localhost:3000/api/redirect">
+                    <Link href="http://localhost:3000/api/auth/login">
                         <Button
                             bg={'blue.400'}
                             color={'white'}
