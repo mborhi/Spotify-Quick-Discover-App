@@ -17,29 +17,29 @@ interface WithRouterProps {
 const Index = ({ router }: WithRouterProps) => {
 
   const [loggedIn, setLoggedIn] = useState(false);
+  const [accessToken, setAccessToken] = useState("");
+
+  const checkLogin = () => {
+    console.log('passed router', router);
+    console.log('document cookie: ', document.cookie);
+    // console.log('local storage access token: ', localStorage.getItem('access_token'));
+
+    const accessTokenData = router.query;
+
+    if (router.query !== {}) {
+      console.log('access token data: ', accessTokenData);
+      console.log('document cookies: ', document.cookie);
+      if (accessTokenData.refresh_token !== undefined) {
+        document.cookie = accessTokenData.refresh_token.toString();
+        setAccessToken(accessTokenData.access_token.toString());
+        setLoggedIn(true);
+        // router.push('/');
+      }
+    }
+  }
 
   useEffect(() => {
-
-    console.log('passed router', router);
-    console.log('local storage access token: ', localStorage.getItem('access_token'));
-    const localStorageAccessToken = localStorage.getItem('access_token');
-
-    if (localStorageAccessToken === null || localStorageAccessToken === "") {
-      console.log('parsed query:', router.query);
-      if (router.query.access_token !== undefined) {
-        const access_token: string = typeof router.query.access_token === 'string' ? router.query.access_token : "";
-        console.log('access_token from router: ', access_token);
-
-        localStorage.setItem('access_token', access_token);
-
-        setLoggedIn(true);
-        router.push('/');
-      }
-      // redirect user to home page
-      // router.push('/');
-    } else {
-      setLoggedIn(true);
-    }
+    checkLogin();
   }, [])
 
   return (
@@ -47,12 +47,12 @@ const Index = ({ router }: WithRouterProps) => {
       <Heading as='h3' size='xl' color='teal'>Home</Heading>
       {loggedIn ?
         (<HStack>
-          <Button>
-            <Link href="/categories">Categories</Link>
-          </Button>
-          <Button>
-            <Link href="/genres">Genres</Link>
-          </Button>
+          <Link href="/categories">
+            <Button>Categories</Button>
+          </Link>
+          <Link href="/genres">
+            <Button>Genres</Button>
+          </Link>
         </HStack>)
         :
         <Login />

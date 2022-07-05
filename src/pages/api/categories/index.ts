@@ -1,23 +1,25 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import { connectToDatabase } from "../../../../utils/database";
-import SpotifyAPIBaseURL from '../endpoints.config'
+import endpoints from '../../../../endpoints.config'
+import getAuthToken from "../../../../utils/authentication";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // have a check for cache here in the future
     const { db } = await connectToDatabase();
     const data = await db.collection('categories').find({}).limit(50).toArray();
     let result = await data;
-    // add handling here for empty results, if the results are empty fetch from spotify
-    if (result.length === 1) {
-        // get categories from spotify
-        const cookies = req.cookies;
-        const token = db.collection('auth_tokens').find({
-            "cookies": cookies
-        });
+    // if the results are empty fetch from spotify and store results in database
+    if (result.length === 0) {
+        // get auth token
+        const token = await getAuthToken(); // TODO: store this in database
+        // make request for categories
         result = await getCategories(token);
+        console.log('categories fetch results: ', result);
+        // insert into database
+        db.collection('categories').insertMany(result);
     }
-    console.log(result);
+
     res.send(result);
 }
 
@@ -32,6 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
  * HTTP Method	    GET
  *
  * OAuth	        Required
+ * @param {string} token            the OAuth2 bearer access token of the user to make request with
  * @param {string} [country='US']   the country code to get categories from
  * @param {string} [locale='us_EN'] the locale code to get categories from
  * @param {number} [limit=50]       the number of categories for query to return
@@ -44,7 +47,7 @@ export const getCategories = async (token: string, country: string = 'US', local
         limit: limit,
         offset: 0
     };
-    let url = SpotifyAPIBaseURL + '/browse/categories?' + stringify(queryData);
+    let url = endpoints.SpotifyAPIBaseURL + '/browse/categories?' + stringify(queryData);
     const response = await fetch(url, {
         method: 'GET',
         headers: {

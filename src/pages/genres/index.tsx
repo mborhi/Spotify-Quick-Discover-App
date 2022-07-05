@@ -5,10 +5,11 @@ import CollectionDisplay from "../../components/CollectionDisplay";
 export async function getServerSideProps(context) {
     const res = await fetch('http://localhost:3000/api/genres');
     const data = await res.json();
-    const genres = JSON.stringify(data);
+    const genres = await JSON.parse(JSON.stringify(data));
+    console.log('getServerSideProps genres: ', genres);
 
     return {
-        properties: {
+        props: {
             genres: genres
         }
     }

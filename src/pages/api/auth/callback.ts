@@ -1,17 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import { connectToDatabase } from "../../../../utils/database";
-import ClientID from '../../../../endpoints.config';
-import ClientSecret from '../../../../endpoints.config';
-import RedirectURI from '../../../../endpoints.config';
+import endpoints from '../../../../endpoints.config';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // connect to data base
     const { db } = await connectToDatabase();
-    const cookies = req.cookies;
-    const client_id = process.env.CLIENT_ID;
-    const client_secret = process.env.CLIENT_SECRET;
-    console.log('cookies: ', cookies);
+    // load env variables
+    const client_id = endpoints.ClientID;
+    const client_secret = endpoints.ClientSecret;
 
     const code = req.query.code || null;
 
@@ -31,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     const data = await response.json();
     console.log('the token : ', await data);
-    // redirect user back to home page attaching the token in the url
-    res.redirect('/?access_token=' + data.access_token);
+    // redirect user back to home page attaching the token data in the url
+    res.redirect('/?' + stringify(data));
 
 }
