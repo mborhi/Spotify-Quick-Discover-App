@@ -15,6 +15,8 @@ export async function getServerSideProps(context) {
     }
 }
 
+// send access_token in api req headers
+
 const Genres = ({ genres }) => {
 
     return (

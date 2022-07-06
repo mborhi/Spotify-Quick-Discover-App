@@ -28,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     const data = await response.json();
     console.log('the token : ', await data);
+    // res.status(200).json({ authToken: data.access_token });
     // redirect user back to home page attaching the token data in the url
     res.redirect('/?' + stringify(data));
 
