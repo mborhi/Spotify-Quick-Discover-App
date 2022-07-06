@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import endpoints from "../../../../endpoints.config";
-import { spotify_playlist } from "../../../../interfaces";
+import { spotify_playlist, TrackData } from "../../../../interfaces";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log('received req', req.query);
@@ -12,7 +12,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (category_id === undefined) {
         res.status(500).send({ error: 'invalid category_id' });
     }
-    console.log('category_id', category_id);
     // retrieve the category's playlist
     if (typeof access_token === 'string' && typeof category_id === 'string') {
         const data = await getCategoryPlaylist(access_token, category_id);
@@ -25,6 +24,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const baseURL = endpoints.SpotifyAPIBaseURL;
+
+type PlaylistNameAndTracks = {
+    playlistName: string
+    playlistTracks: TrackData[]
+}
 
 /**
  * Gets a list of the specified number of given category's playlists' tracks.
@@ -44,7 +48,7 @@ const baseURL = endpoints.SpotifyAPIBaseURL;
  * @param {number} [offset=0]           the offset of results
  * @returns {PlaylistNameAndTracks[]}   a list of PlaylistNameAndTracks
  */
-const getCategoryPlaylist = async (token: string, categoryID: string, country: string = 'US', limit: number = 5, offset: number = 0) => {
+const getCategoryPlaylist = async (token: string, categoryID: string, country: string = 'US', limit: number = 5, offset: number = 0): Promise<PlaylistNameAndTracks[]> => {
     const query = {
         country: country,
         limit: limit,
@@ -64,7 +68,7 @@ const getCategoryPlaylist = async (token: string, categoryID: string, country: s
         console.log('results: ', result);
         let playlists = await result.items;
         // return playlists;
-        let playlistsData = playlists.length !== 0 ? await getPlaylistsData(token, playlists) : [];
+        let playlistsData: PlaylistNameAndTracks[] = playlists.length !== 0 ? await getPlaylistsData(token, playlists) : [];
         return playlistsData;
     } catch (error) {
         console.error("Error: ", error);
@@ -78,7 +82,7 @@ const getCategoryPlaylist = async (token: string, categoryID: string, country: s
  * @param {spotify_playlist[]} playlists    playlists to get data for
  * @returns {PlaylistNameAndTracks[]}       a list of PlaylistNameAndTracks
  */
-const getPlaylistsData = async (token: string, playlists: spotify_playlist[]) => {
+const getPlaylistsData = async (token: string, playlists: spotify_playlist[]): Promise<PlaylistNameAndTracks[]> => {
     let listOfPlaylistsTracks = playlists.map(async (playlist) => {
         let playlistTracks = await getPlayListTracks(token, playlist);
         return { playlistName: playlist.name, playlistTracks: playlistTracks };
@@ -103,7 +107,7 @@ const getPlaylistsData = async (token: string, playlists: spotify_playlist[]) =>
  * @param {string} [market='US']        the market to return tracks from
  * @returns {TrackData[]}               an array of the playlists' tracks data (name, previewURL)
  */
-const getPlayListTracks = async (token: string, playlist: spotify_playlist, fields: string = 'tracks', market: string = 'US') => {
+const getPlayListTracks = async (token: string, playlist: spotify_playlist, fields: string = 'tracks', market: string = 'US'): Promise<TrackData[]> => {
     const query = {
         fields: fields,
         market: market

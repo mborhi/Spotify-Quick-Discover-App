@@ -1,6 +1,8 @@
 # Work Process
 
-## API
+## Client
+
+## Server and API
 
 ### User Authentication
 While designing a way for users to login to spoitfy and for my application to receive the access token, I ran into several problems.
@@ -9,4 +11,6 @@ While designing a way for users to login to spoitfy and for my application to re
 3. How can it be stored securely
 
 ### Category and Genre Retreival
+
+## Database
   

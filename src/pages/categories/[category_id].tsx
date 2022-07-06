@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { VStack, StackDivider, Heading, Link } from "@chakra-ui/layout"
 import { useRouter } from 'next/router';
 import Cookie from 'js-cookie';
-import { stringify } from "querystring";
 import PreviewStackDisplay from "../../components/PreivewStackDisplay";
 
 export default function PreviewStack() {

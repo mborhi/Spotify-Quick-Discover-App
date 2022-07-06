@@ -46,3 +46,11 @@ export type spotify_playlist = {
     type: string
     url: string
 }
+
+export type TrackData = {
+    name: string
+    previewURL: string
+    trackURI: string
+    trackNum: number
+    trackAlbumImage: string
+}
