@@ -22,7 +22,7 @@ const Genres = ({ genres }) => {
     return (
         <>
             <Heading>Genres</Heading>
-            <CollectionDisplay collection={genres} />
+            <CollectionDisplay collectionName={"genres"} collection={genres} />
         </>
     )
 }

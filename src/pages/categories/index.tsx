@@ -41,7 +41,7 @@ const Categories = ({ categories }) => {
     return (
         <>
             <Heading>Categories</Heading>
-            <CollectionDisplay collection={categories} />
+            <CollectionDisplay collectionName={"categories"} collection={categories} />
         </>
     )
 }
