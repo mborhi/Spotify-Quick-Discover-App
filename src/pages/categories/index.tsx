@@ -1,42 +1,26 @@
 import { Heading } from "@chakra-ui/layout"
 import { useEffect, useState } from "react";
+import { loadCategories } from "../../../utils/fetch-categories";
 // import { connectToDatabase } from "../../../utils/database";
 import CollectionDisplay from "../../components/CollectionDisplay";
 
 // fetch categories from the backend
-export async function getServerSideProps(context) {
-    // can make fetch or connect to mongoDb from here
+// TODO: Change this to SSG, using ISR (Incremental Static Regeneration)
+export async function getStaticProps() {
 
-    // const res = await fetch(`http://localhost:3000/api/categories?access_token=${access_token}`);
-    const res = await fetch('http://localhost:3000/api/categories');
-    const data = await res.json();
-    const categories = await JSON.parse(JSON.stringify(data));
+    const categories = await loadCategories();
 
     return {
         props: {
             categories: categories
-        }
+        },
+        revalidate: 3600 // revalidate after one hour
     }
 
 }
 
 
 const Categories = ({ categories }) => {
-
-    // const [categories, setCategories] = useState([]);
-
-    // const getCategories = async () => {
-    //     // const access_token = localStorage.getItem('access_token');
-    //     const access_token = "";
-    //     const res = await fetch(`http://localhost:3000/api/categories?access_token=${access_token}`);
-    //     const data = await res.json();
-    //     const categories = await JSON.parse(JSON.stringify(data));
-    //     setCategories(categories);
-    // }
-
-    // useEffect(() => {
-    //     getCategories();
-    // }, []);
 
     return (
         <>

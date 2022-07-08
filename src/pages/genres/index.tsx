@@ -1,20 +1,19 @@
 import { Heading } from "@chakra-ui/layout";
+import { loadGenres } from "../../../utils/fetch-genres";
 import CollectionDisplay from "../../components/CollectionDisplay";
 
 // fetch genres from backend
-export async function getServerSideProps(context) {
-    const res = await fetch('http://localhost:3000/api/genres');
-    const data = await res.json();
-    const genres = await JSON.parse(JSON.stringify(data));
+export async function getStaticProps() {
+
+    const genres = await loadGenres();
 
     return {
         props: {
             genres: genres
-        }
+        },
+        revalidate: 3600 // revalidate after one hour
     }
 }
-
-// send access_token in api req headers
 
 const Genres = ({ genres }) => {
 
