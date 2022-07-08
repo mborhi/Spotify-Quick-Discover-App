@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // check if the token is expired 
     if (Date.now() > parseInt(expires_in.toString())) {
         // insert an updated entry into database
-        await fetch(`http://localhost:3000/api/auth/refresh_token?=${refresh_token}`);
+        await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
     }
     // query database for the access_token using the refresh_token
     const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token })

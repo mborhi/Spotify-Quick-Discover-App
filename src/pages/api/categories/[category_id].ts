@@ -6,7 +6,6 @@ import { connectToDatabase, queryDatabase } from "../../../../utils/database";
 
 // TODO: error handling for expired tokens
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    console.log('received req', req.query);
     // TOOD: checking of refresh token and retreival of access_token
     // get the refresh_token from req headers
     const { refresh_token } = req.headers;
@@ -15,7 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // check if the token is expired
     if (Date.now() > parseInt(expires_in.toString())) {
         // insert an updated entry into database
-        await fetch(`http://localhost:3000/api/auth/refresh_token?=${refresh_token}`);
+        await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
     }
     // query database for access_token using the refresh_token
     const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token });
@@ -27,7 +26,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // retrieve the category's playlist
     if (typeof access_token === 'string' && typeof category_id === 'string') {
         const data = await getCategoryPlaylist(access_token, category_id);
-        // console.log('result of fetching stuff: ', data);
         res.status(200).send(JSON.stringify(data));
     } else {
         res.status(401).send({ error: 'invalid token' });
@@ -37,7 +35,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const baseURL = endpoints.SpotifyAPIBaseURL;
 
-type PlaylistNameAndTracks = {
+export type PlaylistNameAndTracks = {
     playlistName: string
     playlistTracks: TrackData[]
 }
@@ -77,7 +75,6 @@ const getCategoryPlaylist = async (token: string, categoryID: string, country: s
     try {
         const data = await response.json(); // data.items = playlists
         const result = await data.playlists;
-        console.log('results: ', result);
         let playlists = await result.items;
         // return playlists;
         let playlistsData: PlaylistNameAndTracks[] = playlists.length !== 0 ? await getPlaylistsData(token, playlists) : [];

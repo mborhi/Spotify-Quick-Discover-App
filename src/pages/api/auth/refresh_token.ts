@@ -3,11 +3,16 @@ import { stringify } from "querystring";
 import endpoints from "../../../../endpoints.config";
 import { connectToDatabase } from "../../../../utils/database";
 
+/**
+ * Retreieves a new OAuth2 token using the supplied refresh_token, setting the new token in the database
+ * @param req request handler
+ * @param res response handler
+ */
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // get refresh token from header
     const { refresh_token } = req.query;
     // send post request to Spotify endpoint
-    const url = endpoints.SpotifyAPIBaseURL + '/token';
+    const url = 'https://accounts.spotify.com/api/token';
     const client_id = endpoints.ClientID;
     const client_secret = endpoints.ClientSecret;
     const params = {
@@ -23,7 +28,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         body: stringify(params)
     });
     const data = await response.json();
-    const token = await data.access_token;
+    const token = await data;
     // carry over the refresh_token
     token.refresh_token = refresh_token;
     // calculate the expires_in time
@@ -32,14 +37,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { db } = await connectToDatabase();
     try {
         db.collection('authTokens').replaceOne({ refresh_token: refresh_token }, token);
-        res.status(200);
+        res.status(200).json(token);
     } catch (error) {
-        res.status(500);
+        res.status(500).json({ error: 'internal server error' });
     }
-    // // remove old entry from database
-    // db.collection('authTokens').deleteOne({ refresh_token: refresh_token });
-    // // insert the new entry
-    // db.collection('authTokens').insertOne(token);
 
 }
 

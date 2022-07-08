@@ -3,23 +3,23 @@ import { VStack, StackDivider, Heading, Link } from "@chakra-ui/layout"
 import { useRouter } from 'next/router';
 import Cookie from 'js-cookie';
 import PreviewStackDisplay from "../../components/PreivewStackDisplay";
+import { TrackData } from "../../../interfaces";
+import { PlaylistNameAndTracks } from "../api/categories/[category_id]";
 
 export default function PreviewStack() {
 
     const router = useRouter();
-    const [playlists, setPlaylistTracks] = useState([]);
+    const [playlists, setPlaylistTracks] = useState<PlaylistNameAndTracks[]>([]);
 
-    const getCategoryData = async (category_id) => {
+    const getCategoryData = async (category_id: string) => {
         // console.log('category_id client side: ', category_id);
         const response = await fetch(`http://localhost:3000/api/categories/${category_id}`, {
             method: 'GET',
             headers: {
-                //access_token: Cookie.get('access_token'),
-                refresh_token: Cookie.get('refresh_token'),
-                //expire_time: Cookie.get('expire_time')
+                refresh_token: Cookie.get('refresh_token')
             }
         });
-        let data;
+        let data: PlaylistNameAndTracks[];
         if (response.status === 500) {
             data = [];
         }
@@ -30,7 +30,7 @@ export default function PreviewStack() {
     useEffect(() => {
         // fetch the category data
         const { category_id } = router.query;
-        if (category_id !== undefined) {
+        if (category_id !== undefined && typeof category_id === 'string') {
             getCategoryData(category_id);
         }
     }, [router]);
@@ -38,7 +38,17 @@ export default function PreviewStack() {
     return (
         <>
             <Heading as='h1'><Link href='/'>Home</Link></Heading>
-            <PreviewStackDisplay playlists={playlists} />
+            <VStack>
+                {playlists.length !== 0 ? (
+                    playlists.map((playlist) => (
+                        playlist.playlistTracks.map((track) => (
+                            <Link href={track.previewURL} isExternal={true}>{track.name}</Link>
+                        ))
+                    ))
+                ) : (
+                    <p>loading genre tracks...</p>
+                )}
+            </VStack>
         </>
     )
 }

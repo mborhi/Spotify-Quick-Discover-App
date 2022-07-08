@@ -25,6 +25,7 @@ const GenreTracks = () => {
     }
 
     useEffect(() => {
+        // fetch the genre data
         const { genre_id } = router.query
         if (genre_id !== undefined && typeof genre_id === 'string')
             getGenreTracks(genre_id);
