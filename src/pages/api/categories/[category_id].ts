@@ -2,23 +2,35 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import endpoints from "../../../../endpoints.config";
 import { spotify_playlist, TrackData } from "../../../../interfaces";
+import { connectToDatabase, queryDatabase } from "../../../../utils/database";
 
+// TODO: error handling for expired tokens
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log('received req', req.query);
-    // get the authentication token
-    const access_token = req.headers.access_token;
+    // TOOD: checking of refresh token and retreival of access_token
+    // get the refresh_token from req headers
+    const { refresh_token } = req.headers;
+    // get the expires_in of the access_token
+    const { expires_in } = await queryDatabase('authTokens', { refresh_token: refresh_token });
+    // check if the token is expired
+    if (Date.now() > parseInt(expires_in.toString())) {
+        // insert an updated entry into database
+        await fetch(`http://localhost:3000/api/auth/refresh_token?=${refresh_token}`);
+    }
+    // query database for access_token using the refresh_token
+    const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token });
     // get the category id
     const { category_id } = req.query;
     if (category_id === undefined) {
-        res.status(500).send({ error: 'invalid category_id' });
+        res.status(401).send({ error: 'invalid category_id' });
     }
     // retrieve the category's playlist
     if (typeof access_token === 'string' && typeof category_id === 'string') {
         const data = await getCategoryPlaylist(access_token, category_id);
-        console.log('result of fetching stuff: ', data);
+        // console.log('result of fetching stuff: ', data);
         res.status(200).send(JSON.stringify(data));
     } else {
-        res.status(500).send({ error: 'invalid token' });
+        res.status(401).send({ error: 'invalid token' });
     }
 
 }

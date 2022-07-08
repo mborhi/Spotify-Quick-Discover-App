@@ -54,3 +54,9 @@ export type TrackData = {
     trackNum: number
     trackAlbumImage: string
 }
+
+export interface CollectionMember {
+    id: string
+    name: string
+
+}

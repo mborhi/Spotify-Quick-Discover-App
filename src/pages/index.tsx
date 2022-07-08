@@ -24,9 +24,10 @@ const Index = ({ initialLoggedIn = false, router }: WithRouterProps) => {
     const refresh_token = router.query.refresh_token;
     if (!loggedIn && refresh_token !== undefined) {
       Cookie.set('refresh_token', refresh_token);
-      Cookie.set('access_token', router.query.access_token);
+      // Cookie.set('access_token', router.query.access_token);
+      // Cookie.set('expire_time', Date.now() + (3540 * 1000));
       setLoggedIn(true);
-      // TODO: redirect user to home url with no query params
+      router.push('/');
     }
   }, [loggedIn])
 

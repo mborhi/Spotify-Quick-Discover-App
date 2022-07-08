@@ -27,9 +27,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         body: stringify(params)
     });
     const data = await response.json();
-    console.log('the token : ', await data);
+    const token = await data;
+    token.expires_in = Date.now() + (3540 * 1000); // current time + 59 mins
+    console.log('the token : ', token);
+    // set the token details in the database
+    db.collection('authTokens').insertOne(token);
     // res.status(200).json({ authToken: data.access_token });
     // redirect user back to home page attaching the token data in the url
-    res.redirect('/?' + stringify(data));
+    res.status(200).redirect('/?' + stringify(token));
 
 }

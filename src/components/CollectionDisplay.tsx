@@ -1,10 +1,7 @@
 import { SimpleGrid, Container, Link, Box, Heading } from "@chakra-ui/layout";
 import React, { useEffect } from "react";
+import { CollectionMember } from "../../interfaces";
 
-type CollectionMember = {
-    id: string,
-    name: string
-}
 
 type Props = {
     collectionName: string

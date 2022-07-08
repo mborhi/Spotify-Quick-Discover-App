@@ -2,20 +2,21 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { VStack, StackDivider, Heading, Link, Box } from "@chakra-ui/layout"
 import Cookie from 'js-cookie';
+import { TrackData } from "../../../interfaces";
 
 const GenreTracks = () => {
 
     const router = useRouter();
-    const [tracks, setTracks] = useState([]);
+    const [tracks, setTracks] = useState<TrackData[]>([]);
 
-    const getGenreTracks = async (genre_id) => {
+    const getGenreTracks = async (genre_id: string) => {
         const response = await fetch(`http://localhost:3000/api/genres/${genre_id}`, {
             method: 'GET',
             headers: {
-                access_token: Cookie.get('access_token')
+                refresh_token: Cookie.get('refresh_token')
             }
         });
-        let data;
+        let data: TrackData[];
         if (response.status === 500) {
             data = [];
         }
@@ -25,7 +26,7 @@ const GenreTracks = () => {
 
     useEffect(() => {
         const { genre_id } = router.query
-        if (genre_id !== undefined)
+        if (genre_id !== undefined && typeof genre_id === 'string')
             getGenreTracks(genre_id);
     }, [router]);
 

@@ -3,6 +3,7 @@ import { stringify } from "querystring";
 import { connectToDatabase } from "../../../../utils/database";
 import endpoints from '../../../../endpoints.config'
 import getAuthToken from "../../../../utils/authentication";
+import { CollectionMember } from "../../../../interfaces";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // have a check for cache here in the future
@@ -15,7 +16,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const token = await getAuthToken(); // TODO: store this in database
         // make request for categories
         result = await getCategories(token);
-        console.log('categories fetch results: ', result);
         // insert into database
         db.collection('categories').insertMany(result);
     }
@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
  * @param {number} [limit=50]       the number of categories for query to return
  * @returns {spotify_category[]}    a list of categories
  */
-export const getCategories = async (token: string, country: string = 'US', locale: string = 'us_EN', limit: number = 50) => {
+export const getCategories = async (token: string, country: string = 'US', locale: string = 'us_EN', limit: number = 50): Promise<CollectionMember[]> => {
     const queryData = {
         country: country,
         locale: locale,
@@ -58,15 +58,8 @@ export const getCategories = async (token: string, country: string = 'US', local
     // console.log('response: ', await response.json());
     try {
         const data = await response.json();
-        // const data = checkFetch(await response.json());
-        // console.log('music data: ', await data);
-        const categories = await data.categories.items;
-        // console.log(categories);
-        // console.log('returning categories');
-        return await categories;
-        // const categoryList = await data.categories.items.map((item) => item.id);
-        // return categoryList;
-        // res.json(categoryList);
+        const categories: CollectionMember[] = await data.categories.items;
+        return categories;
     } catch (error) {
         console.error(error);
         return [];

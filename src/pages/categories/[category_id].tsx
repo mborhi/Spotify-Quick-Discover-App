@@ -10,11 +10,13 @@ export default function PreviewStack() {
     const [playlists, setPlaylistTracks] = useState([]);
 
     const getCategoryData = async (category_id) => {
-        console.log('category_id client side: ', category_id);
+        // console.log('category_id client side: ', category_id);
         const response = await fetch(`http://localhost:3000/api/categories/${category_id}`, {
             method: 'GET',
             headers: {
-                access_token: Cookie.get('access_token')
+                //access_token: Cookie.get('access_token'),
+                refresh_token: Cookie.get('refresh_token'),
+                //expire_time: Cookie.get('expire_time')
             }
         });
         let data;

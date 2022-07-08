@@ -1,25 +1,6 @@
-// require('dotenv').config();
-// const { MongoClient, ServerApiVersion } = require('mongodb');
-
-// const client = new MongoClient(process.env.DATABASE_URL, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-// });
-
-// const connectToDatabse = async () => {
-//     if (!client.isConnected()) await client.connect();
-//     const db = client.db();
-//     return { db, client };
-// }
-
-// export { connectToDatabse }
 import { MongoClient } from 'mongodb'
 
 const uri = process.env.MONGODB_URI
-// const options = {}
-
-let client
-let clientPromise
 
 if (!process.env.MONGODB_URI) {
     throw new Error('Please add your Mongo URI to .env.local')
@@ -50,4 +31,16 @@ export async function connectToDatabase() {
     }
     cached.conn = await cached.promise;
     return cached.conn;
+}
+
+/**
+ * Finds one entry using the given query from the specified collection of the database
+ * @param collection the collection in the database to query from
+ * @param query the search query
+ * @returns the result of the search
+ */
+export const queryDatabase = async (collection: string, query) => {
+    const { db } = await connectToDatabase();
+    const result = db.collection(collection).findOne(query);
+    return await result;
 }
