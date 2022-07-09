@@ -9,6 +9,10 @@ const GenreTracks = () => {
     const router = useRouter();
     const [tracks, setTracks] = useState<TrackData[]>([]);
 
+    /**
+     * Retreives tracks from the given genre, setting the results in tracks
+     * @param genre_id the id of the genre
+     */
     const getGenreTracks = async (genre_id: string) => {
         const response = await fetch(`http://localhost:3000/api/genres/${genre_id}`, {
             method: 'GET',

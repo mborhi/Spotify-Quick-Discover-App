@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // if the results are empty fetch from spotify and store results in database
     if (result.length === 0) {
         // get auth token
-        const token = await getAuthToken(); // TODO: store this in database
+        const token = await getAuthToken();
         // make request for categories
         result = await getCategories(token);
         // insert into database

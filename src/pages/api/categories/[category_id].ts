@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import endpoints from "../../../../endpoints.config";
-import { spotify_playlist, TrackData } from "../../../../interfaces";
+import { SpotifyPlaylist, TrackData } from "../../../../interfaces";
 import { connectToDatabase, queryDatabase } from "../../../../utils/database";
 
 // TODO: error handling for expired tokens
@@ -88,10 +88,10 @@ const getCategoryPlaylist = async (token: string, categoryID: string, country: s
 /**
  * Gets PlaylistNameAndTracks for the given list of spotify_playlists.
  * @param {string} token                    the user's OAuth2 token
- * @param {spotify_playlist[]} playlists    playlists to get data for
+ * @param {SpotifyPlaylist[]} playlists    playlists to get data for
  * @returns {PlaylistNameAndTracks[]}       a list of PlaylistNameAndTracks
  */
-const getPlaylistsData = async (token: string, playlists: spotify_playlist[]): Promise<PlaylistNameAndTracks[]> => {
+const getPlaylistsData = async (token: string, playlists: SpotifyPlaylist[]): Promise<PlaylistNameAndTracks[]> => {
     let listOfPlaylistsTracks = playlists.map(async (playlist) => {
         let playlistTracks = await getPlayListTracks(token, playlist);
         return { playlistName: playlist.name, playlistTracks: playlistTracks };
@@ -111,12 +111,12 @@ const getPlaylistsData = async (token: string, playlists: spotify_playlist[]): P
  * 
  * OAuth	        Required
  * @param {string} token                the user's OAuth2 token
- * @param {spotify_playlist} playlist   the playlist to get the tracks of
+ * @param {SpotifyPlaylist} playlist   the playlist to get the tracks of
  * @param {string} [fields='tracks']    the type to return
  * @param {string} [market='US']        the market to return tracks from
  * @returns {TrackData[]}               an array of the playlists' tracks data (name, previewURL)
  */
-const getPlayListTracks = async (token: string, playlist: spotify_playlist, fields: string = 'tracks', market: string = 'US'): Promise<TrackData[]> => {
+const getPlayListTracks = async (token: string, playlist: SpotifyPlaylist, fields: string = 'tracks', market: string = 'US'): Promise<TrackData[]> => {
     const query = {
         fields: fields,
         market: market

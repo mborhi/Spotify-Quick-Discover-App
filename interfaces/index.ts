@@ -1,4 +1,4 @@
-export type spotify_playlist = {
+export interface SpotifyPlaylist {
     collaborative: boolean
     description: string
     external_urls: {
@@ -47,7 +47,7 @@ export type spotify_playlist = {
     url: string
 }
 
-export type TrackData = {
+export interface TrackData {
     name: string
     previewURL: string
     trackURI: string

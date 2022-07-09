@@ -16,6 +16,10 @@ if (!cached) {
     cached = global.mongo = { conn: null, promise: null }
 }
 
+/**
+ * Connects to the database specified in the env file
+ * @returns the connection to the database
+ */
 export async function connectToDatabase() {
     if (cached.conn) {
         return cached.conn;
