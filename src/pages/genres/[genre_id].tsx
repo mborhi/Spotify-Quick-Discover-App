@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { VStack, StackDivider, Heading, Link, Box } from "@chakra-ui/layout"
 import Cookie from 'js-cookie';
 import { TrackData } from "../../../interfaces";
+import PreviewStackDisplay from "../../components/PreivewStackDisplay";
 
 const GenreTracks = () => {
 
     const router = useRouter();
     const [tracks, setTracks] = useState<TrackData[]>([]);
+    const [currentTrack, setCurrentTrack] = useState({});
 
     /**
      * Retreives tracks from the given genre, setting the results in tracks
@@ -37,16 +39,9 @@ const GenreTracks = () => {
 
     return (
         <>
-            <Heading as='h1'><Link href='/'>Home</Link></Heading>
-            <VStack>
-                {tracks.length !== 0 ? (
-                    tracks.map((track) => (
-                        <Link href={track.previewURL} isExternal={true}>{track.name}</Link>
-                    ))
-                ) : (
-                    <p>loading genre tracks...</p>
-                )}
-            </VStack>
+            <Heading as='h1'><Link href='/' color='teal.700'>Home</Link></Heading>
+            <Heading as='h2'><Link href='/genres' color='teal.500'>Genres</Link></Heading>
+            <PreviewStackDisplay dataList={tracks} />
         </>
     )
 }

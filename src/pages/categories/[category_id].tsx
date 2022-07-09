@@ -27,6 +27,16 @@ export default function PreviewStack() {
         setPlaylistTracks(data);
     }
 
+    const compressPlaylistData = () => {
+        let compressedListOfPlaylistData = []
+        playlists.forEach((playlist) => {
+            playlist.playlistTracks.forEach((trackData) => {
+                compressedListOfPlaylistData.push(trackData);
+            })
+        });
+        return compressedListOfPlaylistData;
+    }
+
     useEffect(() => {
         // fetch the category data
         const { category_id } = router.query;
@@ -37,7 +47,10 @@ export default function PreviewStack() {
 
     return (
         <>
-            <Heading as='h1'><Link href='/'>Home</Link></Heading>
+            <Heading as='h1'><Link href='/' color='teal.700'>Home</Link></Heading>
+            <Heading as='h2'><Link href='/categories' color='teal.500'>Categories</Link></Heading>
+            <PreviewStackDisplay dataList={compressPlaylistData()} />
+            {/*
             <VStack>
                 {playlists.length !== 0 ? (
                     playlists.map((playlist) => (
@@ -49,6 +62,7 @@ export default function PreviewStack() {
                     <p>loading genre tracks...</p>
                 )}
             </VStack>
+                */}
         </>
     )
 }

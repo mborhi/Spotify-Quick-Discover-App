@@ -1,22 +1,25 @@
-import { useEffect } from "react";
+import { VStack, StackDivider } from "@chakra-ui/layout"
+import { TrackData } from "../../interfaces";
+import MusicPreviewPlayback from "./MusicPreviewPlayback";
 
-const PreviewStackDisplay = ({ playlists }) => {
-    useEffect(() => {
-        console.log(playlists);
-    }, [])
+interface Props {
+    dataList: TrackData[]
+}
+
+const PreviewStackDisplay = ({ dataList }: Props) => {
+
     return (
-        playlists ? (
-            playlists.map((playlist) => (
-                <>
-                    <p>{playlist.playlistName}</p>
-                    {playlist.playlistTracks.map((track) => (
-                        <p>{track.previewURL}</p>
-                    ))}
-                </>
-            ))
-        ) : (
-            <p>loading playlists</p>
-        )
+        <>
+            <VStack
+                divider={<StackDivider borderColor='gray.300' />}
+                spacing={4}
+                align='center'
+            >
+                {dataList.map((data) => (
+                    <MusicPreviewPlayback trackData={data} changeTrack={() => null} key={data.trackURI} />
+                ))}
+            </VStack>
+        </>
     )
 }
 
