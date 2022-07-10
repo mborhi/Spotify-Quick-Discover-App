@@ -12,7 +12,7 @@ type Props = {
 const CollectionDisplay = ({ collectionName, collection }: Props) => {
 
     useEffect(() => {
-        console.log('colleciton display: ', collection);
+        // console.log('colleciton display: ', collection);
     }, [])
 
     return (

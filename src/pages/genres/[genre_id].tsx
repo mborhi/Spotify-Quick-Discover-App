@@ -1,15 +1,19 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { VStack, StackDivider, Heading, Link, Box } from "@chakra-ui/layout"
+import { VStack, StackDivider, Heading, Link, Box, Flex, Grid, GridItem, Spacer } from "@chakra-ui/layout"
 import Cookie from 'js-cookie';
 import { TrackData } from "../../../interfaces";
 import PreviewStackDisplay from "../../components/PreivewStackDisplay";
+import WebPlayer from "../../components/WebPlayer";
+import setupPlayer from "../../../utils/setup-player";
 
 const GenreTracks = () => {
 
     const router = useRouter();
     const [tracks, setTracks] = useState<TrackData[]>([]);
-    const [currentTrack, setCurrentTrack] = useState({});
+    const [active, setActive] = useState(false);
+    const [currentTrack, setCurrentTrack] = useState(null);
+    const [player, setPlayer] = useState(false);
 
     /**
      * Retreives tracks from the given genre, setting the results in tracks
@@ -30,18 +34,59 @@ const GenreTracks = () => {
         setTracks(data);
     }
 
+    const getAccessToken = async () => {
+        const response = await fetch('http://localhost:3000/api/auth/access_token', {
+            headers: {
+                refresh_token: Cookie.get('refresh_token')
+            }
+        });
+
+        const access_token = await response.json();
+        return await access_token;
+    }
+
     useEffect(() => {
         // fetch the genre data
+
         const { genre_id } = router.query
-        if (genre_id !== undefined && typeof genre_id === 'string')
+        if (genre_id !== undefined && typeof genre_id === 'string') {
             getGenreTracks(genre_id);
+        }
+        if (!player) {
+            getAccessToken().then(token => {
+                setupPlayer(token, setPlayer);
+            });
+        }
+
     }, [router]);
+
+    const playTrack = (track) => {
+        setCurrentTrack(track);
+        setActive(true);
+    }
 
     return (
         <>
             <Heading as='h1'><Link href='/' color='teal.700'>Home</Link></Heading>
             <Heading as='h2'><Link href='/genres' color='teal.500'>Genres</Link></Heading>
-            <PreviewStackDisplay dataList={tracks} />
+            {/*<PreviewStackDisplay dataList={tracks} /> */}
+            <Flex align='vertical-align' pos='relative' gap='2' marginTop="25px" marginBottom="50px">
+                <Box flex='4' pos='relative'>
+                    {/*previewPlayback*/}
+                    <PreviewStackDisplay dataList={tracks} changeTrack={playTrack} />
+                </Box>
+                <Spacer />
+                <Box flex='6' pos='relative' overflow='wrap'>
+                    <Grid templateRows='repeat(2, 1fr)'>
+                        <GridItem pos='relative'><Heading as='h3' size='lg'>Player</Heading></GridItem>
+                        <GridItem>
+                            <Box pos='fixed' w={[300, 400, 500]} zIndex={2}>
+                                {active ? <WebPlayer track={currentTrack} /> : <h3>no song active...</h3>}
+                            </Box>
+                        </GridItem>
+                    </Grid>
+                </Box>
+            </Flex>
         </>
     )
 }

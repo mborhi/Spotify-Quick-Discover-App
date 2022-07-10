@@ -3,10 +3,11 @@ import { TrackData } from "../../interfaces";
 import MusicPreviewPlayback from "./MusicPreviewPlayback";
 
 interface Props {
-    dataList: TrackData[]
+    dataList: TrackData[],
+    changeTrack: (track) => void
 }
 
-const PreviewStackDisplay = ({ dataList }: Props) => {
+const PreviewStackDisplay = ({ dataList, changeTrack }: Props) => {
 
     return (
         <>
@@ -16,7 +17,7 @@ const PreviewStackDisplay = ({ dataList }: Props) => {
                 align='center'
             >
                 {dataList.map((data) => (
-                    <MusicPreviewPlayback trackData={data} changeTrack={() => null} key={data.trackURI} />
+                    <MusicPreviewPlayback trackData={data} changeTrack={changeTrack} key={data.trackURI} />
                 ))}
             </VStack>
         </>

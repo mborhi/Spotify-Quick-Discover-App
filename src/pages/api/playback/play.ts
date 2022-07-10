@@ -15,14 +15,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token });
     // get query params from request
     const { device_id, trackURI, trackNum } = req.query;
-
+    console.log('received d_id, trUri, trNum: ', device_id, trackURI, trackNum);
     let reqParams = {
         device_id: device_id
     }
     const bodyParams = {
         "context_uri": trackURI,
         "offset": {
-            "position": trackNum
+            "position": parseInt(trackNum.toString()) - 1
         },
         "position_ms": 0
     }
@@ -38,5 +38,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
     });
 
-    res.send({ "message": "playing song..." });
+    console.log('played: ', response);
+
+    res.json({ "message": "playing song..." });
 }
+
+export default handler;

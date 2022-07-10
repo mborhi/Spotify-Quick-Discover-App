@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import endpointsConfig from "../../../../endpoints.config";
 import { queryDatabase } from "../../../../utils/database";
 
+// TODO: abstrac this with play.ts
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { refresh_token } = req.headers;
     // handle fetching access_token
@@ -22,6 +23,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             'Authorization': `Bearer ${access_token}`
         }
     });
-    res.send({ "message": "pausing song..." });
+    console.log('paused: ', response);
+    res.json({ "message": "pausing song..." });
 
 }
+
+export default handler;
