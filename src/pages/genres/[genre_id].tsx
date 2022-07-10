@@ -52,11 +52,11 @@ const GenreTracks = () => {
         if (genre_id !== undefined && typeof genre_id === 'string') {
             getGenreTracks(genre_id);
         }
-        if (!player) {
-            getAccessToken().then(token => {
-                setupPlayer(token, setPlayer);
-            });
-        }
+
+        getAccessToken().then(token => {
+            setupPlayer(token);
+        });
+
 
     }, [router]);
 

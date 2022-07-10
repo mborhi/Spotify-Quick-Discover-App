@@ -1,4 +1,6 @@
-const setupPlayer = (access_token, setPlayer) => {
+import Cookie from 'js-cookie';
+
+const setupPlayer = (access_token) => {
     const script = document.createElement("script");
     script.src = "https://sdk.scdn.co/spotify-player.js";
     script.async = true;
@@ -15,8 +17,9 @@ const setupPlayer = (access_token, setPlayer) => {
         });
 
         player.addListener('ready', ({ device_id }) => {
-            // console.log('Ready with Device ID', event.device_id);
-            localStorage.setItem('device_id', device_id);
+            console.log('Ready with Device ID', device_id);
+            Cookie.set('device_id', device_id);
+            // localStorage.setItem('device_id', device_id);
         });
 
 
@@ -34,7 +37,6 @@ const setupPlayer = (access_token, setPlayer) => {
 
         player.connect().then(success => {
             if (success) {
-                setPlayer(true);
                 console.log("The Web Playback SDK successfully connected to Spotify!");
 
             }
