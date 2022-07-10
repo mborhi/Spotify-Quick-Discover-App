@@ -20,18 +20,6 @@ interface WithRouterProps {
 const Index = ({ initialLoggedIn = false, router }: WithRouterProps) => {
 
   const [loggedIn, setLoggedIn] = useState(() => initialLoggedIn);
-  const [player, setPlayer] = useState(null);
-
-  const getAccessToken = async () => {
-    const response = await fetch('http://localhost:3000/api/auth/access_token', {
-      headers: {
-        refresh_token: Cookie.get('refresh_token')
-      }
-    });
-
-    const access_token = await response.json();
-    return await access_token;
-  }
 
   useEffect(() => {
     const refresh_token = router.query.refresh_token;
@@ -40,9 +28,6 @@ const Index = ({ initialLoggedIn = false, router }: WithRouterProps) => {
       setLoggedIn(true);
       router.push('/');
     }
-    // getAccessToken().then(access_token => {
-    //   setupPlayer(access_token);
-    // });
 
   }, [loggedIn])
 

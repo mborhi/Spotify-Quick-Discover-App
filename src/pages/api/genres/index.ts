@@ -7,7 +7,7 @@ import { CollectionMember } from "../../../../interfaces";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // have a check for cache here in the future
     const { db } = await connectToDatabase();
-    const data = await db.collection('genres').find({}).limit(50).toArray();
+    const data = await db.collection('genres').find({}).toArray();
     let result = await data;
     // add handling here for empty results, if the results are empty fetch from spotify
     if (result.length === 0) {
@@ -18,6 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // insert genres into data base
         db.collection('genres').insertMany(result);
     }
+
     res.send(result);
 }
 
@@ -36,6 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
  * @returns {array}         list of genres
  */
 const getAvailableGenreSeeds = async (token: string): Promise<CollectionMember[]> => {
+    console.log('getting available genre seeds...');
     const url = endpoints.SpotifyAPIBaseURL + '/recommendations/available-genre-seeds';
     const response = await fetch(url, {
         method: 'GET',
