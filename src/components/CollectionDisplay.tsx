@@ -17,7 +17,6 @@ const CollectionDisplay = ({ collectionName, collection }: Props) => {
 
     return (
         <Container>
-            <Heading as='h2' size='md'><Link href='/' color='teal'>Home</Link></Heading>
             <SimpleGrid columns={5} spacing={10}>
                 {collection.map((member: CollectionMember) => (
                     <Link href={`/${collectionName}/${member.id}`} key={member.id}>

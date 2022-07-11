@@ -1,14 +1,65 @@
 import { CollectionMember } from "../interfaces";
+import getAuthToken from "./authentication";
+import { connectToDatabase } from "./database";
+import endpoints from "../endpoints.config";
 
-// TODO: make spotify api call here
 /**
  * Retrieves a list of genres
  * @returns {Promise<CollectionMember[]>} the list of genres
  */
 export const loadGenres = async (): Promise<CollectionMember[]> => {
-    const res = await fetch('http://localhost:3000/api/genres');
-    const data = await res.json();
-    const genres = await JSON.parse(JSON.stringify(data));
+    const { db } = await connectToDatabase();
+    const data = await db.collection('genres').find({}).toArray();
+    let result = await data;
+    // add handling here for empty results, if the results are empty fetch from spotify
+    if (result.length === 0) {
+        // retrieve the application access token
+        const token = await getAuthToken(); // TODO: store this in database
+        // make request for genre seeds
+        result = await getAvailableGenreSeeds(token);
+        // insert genres into data base
+        db.collection('genres').insertMany(result);
+    }
+    return JSON.parse(JSON.stringify(result));
+}
 
-    return genres;
+/**
+ * Returns a list of available genres.
+ * Uses Get Available Genre Seeds Spotify Web API call:
+ * 
+ * API Reference	Get Available Genre Seeds
+ * 
+ * Endpoint	        https://api.spotify.com/v1/recommendations/available-genre-seeds
+ * 
+ * HTTP Method	    GET
+ * 
+ * OAuth	        Required
+ * @param {string} token    the OAuth2 bearer access token of the user to make request with 
+ * @returns {array}         list of genres
+ */
+const getAvailableGenreSeeds = async (token: string): Promise<CollectionMember[]> => {
+    console.log('getting available genre seeds...');
+    const url = endpoints.SpotifyAPIBaseURL + '/recommendations/available-genre-seeds';
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        }
+    });
+    try {
+        const data = await response.json();
+        const genres: string[] = await data.genres;
+        // TOOD: turn this into type (this must comply with CollectionDisplay component)
+        const results = genres.map(async (genre: string) => {
+            return {
+                id: genre,
+                name: genre
+            }
+        });
+        return await Promise.all(results);
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
 }

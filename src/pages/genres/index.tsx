@@ -1,8 +1,7 @@
-import { Heading } from "@chakra-ui/layout";
+import { Heading, Link } from "@chakra-ui/layout";
 import { loadGenres } from "../../../utils/fetch-genres";
 import CollectionDisplay from "../../components/CollectionDisplay";
 
-// fetch genres from backend
 export async function getStaticProps() {
 
     const genres = await loadGenres();
@@ -19,7 +18,8 @@ const Genres = ({ genres }) => {
 
     return (
         <>
-            <Heading>Genres</Heading>
+            <Heading as='h1'><Link href='/' color='teal.700'>Home</Link></Heading>
+            <Heading color='teal.500'>Genres</Heading>
             <CollectionDisplay collectionName={"genres"} collection={genres} />
         </>
     )

@@ -1,11 +1,7 @@
-import { Heading } from "@chakra-ui/layout"
-import { useEffect, useState } from "react";
+import { Heading, Link } from "@chakra-ui/layout"
 import { loadCategories } from "../../../utils/fetch-categories";
-// import { connectToDatabase } from "../../../utils/database";
 import CollectionDisplay from "../../components/CollectionDisplay";
 
-// fetch categories from the backend
-// TODO: Change this to SSG, using ISR (Incremental Static Regeneration)
 export async function getStaticProps() {
 
     const categories = await loadCategories();
@@ -24,7 +20,8 @@ const Categories = ({ categories }) => {
 
     return (
         <>
-            <Heading>Categories</Heading>
+            <Heading as='h1'><Link href='/' color='teal.700'>Home</Link></Heading>
+            <Heading color='teal.500'>Categories</Heading>
             <CollectionDisplay collectionName={"categories"} collection={categories} />
         </>
     )
