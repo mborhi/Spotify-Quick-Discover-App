@@ -26,12 +26,12 @@ const GenreTracks = () => {
                 refresh_token: Cookie.get('refresh_token')
             }
         });
-        let data: TrackData[];
-        if (response.status === 500) {
-            data = [];
+        let data = await response.json();
+        if (data.items === undefined) {
+            setTracks([]);
         }
-        data = await response.json();
-        setTracks(data);
+        console.log('the received track data: ', data);
+        setTracks(data.items);
     }
 
     const getAccessToken = async () => {

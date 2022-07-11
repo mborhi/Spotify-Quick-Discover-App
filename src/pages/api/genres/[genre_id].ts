@@ -5,30 +5,29 @@ import { TrackData } from "../../../../interfaces";
 import { queryDatabase } from "../../../../utils/database";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    // get the refresh_token from req headers
     const { refresh_token } = req.headers;
     // get the expires_in of the corresponding access_token
     const { expires_in } = await queryDatabase('authTokens', { refresh_token: refresh_token });
-    // check if the token is expired 
+    // if the access_token is expired, insert an updated entry into database
     if (Date.now() > parseInt(expires_in.toString())) {
-        // insert an updated entry into database
         await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
     }
     // query database for the access_token using the refresh_token
-    const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token })
+    const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token });
     // get the genre_id
     const { genre_id } = req.query;
-    // check if it is valid
     if (genre_id === undefined) {
-        res.status(400).json({ error: 'invalid genre_id' });
+        res.status(403).json({ error: { status: 403, message: 'invalid genre_id' } });
     }
-    // check fo access_token validity
+    // check fo access_token validity and retrieve the songs for this genre
     if (typeof access_token === 'string' && typeof genre_id === 'string') {
-        // retrieve the songs for this genre
         const data = await getGenreTracks(access_token, genre_id);
-        res.status(200).send(JSON.stringify(data));
+        if (data.length === 0) {
+            res.status(500).json({ error: { status: 500, message: 'internal server error' } });
+        } else
+            res.status(200).json({ items: data });
     } else {
-        res.status(401).json({ error: 'invalid token' });
+        res.status(401).json({ error: { status: 401, message: 'invalid token' } });
     }
 }
 
@@ -42,6 +41,9 @@ const baseURL = endpoints.SpotifyAPIBaseURL;
  */
 const getGenreTracks = async (token: string, genre: string): Promise<TrackData[]> => {
     const genreItems = await searchGenre(token, genre);
+    if (genreItems.length === 0) {
+        return [];
+    }
     const genreTracks = genreItems.map((item) => {
         return {
             name: item.name,
@@ -67,7 +69,7 @@ const getGenreTracks = async (token: string, genre: string): Promise<TrackData[]
  * OAuth	        Required
  * @param {string} token    the OAuth access token 
  * @param {string} genre    the spotify category to search for
- * @param {number} limit    the number of results to include in return (defualt = 5)
+ * @param {number} limit    the number of results to include in return (defualt = 50)
  * @returns {track[]}       a list of tracks from the specified genre
  */
 const searchGenre = async (token: string, genre: string, limit: number = 50): Promise<any> => {
@@ -91,7 +93,7 @@ const searchGenre = async (token: string, genre: string, limit: number = 50): Pr
         let items = await data.tracks.items;
         return items;
     } catch (error) {
-        console.log('error:', error);
+        return [];
     }
 }
 

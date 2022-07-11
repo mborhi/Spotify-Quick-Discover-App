@@ -33,6 +33,8 @@ const MusicPreviewPlayback = ({ trackData, changeTrack }) => {
      * Handles the button click for track change
      */
     const handleTrackChange = () => {
+        setPaused(true);
+        audioObject.pause();
         changeTrack(trackData);
     }
 

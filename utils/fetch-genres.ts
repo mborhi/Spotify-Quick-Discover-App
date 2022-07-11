@@ -1,5 +1,6 @@
 import { CollectionMember } from "../interfaces";
 
+// TODO: make spotify api call here
 /**
  * Retrieves a list of genres
  * @returns {Promise<CollectionMember[]>} the list of genres

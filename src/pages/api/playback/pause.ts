@@ -23,7 +23,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             'Authorization': `Bearer ${access_token}`
         }
     });
-    console.log('paused: ', response);
+
     res.json({ "message": "pausing song..." });
 
 }

@@ -38,8 +38,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
     });
 
-    console.log('played: ', response);
-
     res.json({ "message": "playing song..." });
 }
 

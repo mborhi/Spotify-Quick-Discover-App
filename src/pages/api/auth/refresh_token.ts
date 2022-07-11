@@ -39,7 +39,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         db.collection('authTokens').replaceOne({ refresh_token: refresh_token }, token);
         res.status(200).json(token);
     } catch (error) {
-        res.status(500).json({ error: 'internal server error' });
+        res.status(500).json({ error: { status: 500, message: 'internal server error' } });
     }
 
 }

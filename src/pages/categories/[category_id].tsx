@@ -22,12 +22,13 @@ export default function PreviewStack() {
                 refresh_token: Cookie.get('refresh_token')
             }
         });
-        let data: PlaylistNameAndTracks[];
-        if (response.status === 500) {
-            data = [];
+        const data = await response.json();
+        if (data.items === undefined) {
+            setPlaylistTracks([]);
+            // TODO: add state for error, which is displayed if playlistTracks is empty
         }
-        data = await response.json();
-        setPlaylistTracks(data);
+        console.log('data: ', data);
+        setPlaylistTracks(data.items);
     }
 
     const compressPlaylistData = () => {

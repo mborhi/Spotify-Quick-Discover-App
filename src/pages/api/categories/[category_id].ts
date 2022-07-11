@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import endpoints from "../../../../endpoints.config";
 import { SpotifyPlaylist, TrackData } from "../../../../interfaces";
-import { connectToDatabase, queryDatabase } from "../../../../utils/database";
+import { queryDatabase } from "../../../../utils/database";
 
 // TODO: error handling for expired tokens
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -21,14 +21,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // get the category id
     const { category_id } = req.query;
     if (category_id === undefined) {
-        res.status(401).send({ error: 'invalid category_id' });
+        res.status(403).json({ error: { status: 403, message: 'invalid category_id' } });
     }
     // retrieve the category's playlist
     if (typeof access_token === 'string' && typeof category_id === 'string') {
         const data = await getCategoryPlaylist(access_token, category_id);
-        res.status(200).send(JSON.stringify(data));
+        if (data.length === 0) {
+            res.status(500).json({ error: { status: 500, message: 'internal server error' } })
+        }
+        else
+            res.status(200).json({ items: data });
     } else {
-        res.status(401).send({ error: 'invalid token' });
+        res.status(401).json({ error: { status: 401, message: 'invalid token' } });
     }
 
 }

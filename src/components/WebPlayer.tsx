@@ -25,7 +25,6 @@ const WebPlayer = ({ track }: Props) => {
                 }
             });
             const data = await response.json();
-            console.log('pause :', data);
             setPaused(true);
         } else {
             const queryParams = {
@@ -39,7 +38,6 @@ const WebPlayer = ({ track }: Props) => {
                 }
             });
             const data = await response.json();
-            console.log('play : ', data);
             setPaused(false);
         }
     }

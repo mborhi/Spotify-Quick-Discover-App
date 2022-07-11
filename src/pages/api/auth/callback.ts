@@ -3,6 +3,11 @@ import { stringify } from "querystring";
 import { connectToDatabase } from "../../../../utils/database";
 import endpoints from '../../../../endpoints.config';
 
+/**
+ * The Spotify Authorization Code Flow callback endpoint handler
+ * @param req request handler
+ * @param res response handler
+ */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // connect to data base
     const { db } = await connectToDatabase();
