@@ -29,15 +29,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
     const data = await response.json();
     const token = await data;
-    // carry over the refresh_token
-    token.refresh_token = refresh_token;
-    // calculate the expires_in time
-    token.expires_in = Date.now() + (1000 * 3540);
+    // carry over the refresh_token, and calculate the expires_in time
+    const newToken = { ...token, refresh_token: refresh_token, expires_in: Date.now() + (1000 * 3540) };
     // update db
     const { db } = await connectToDatabase();
     try {
-        db.collection('authTokens').replaceOne({ refresh_token: refresh_token }, token);
-        res.status(200).json(token);
+        db.collection('authTokens').replaceOne({ refresh_token: refresh_token }, newToken);
+        res.status(200).json({ token: newToken });
     } catch (error) {
         res.status(500).json({ error: { status: 500, message: 'internal server error' } });
     }

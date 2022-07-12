@@ -3,21 +3,30 @@ import { stringify } from "querystring";
 import endpoints from "../../../../endpoints.config";
 import { SpotifyPlaylist, TrackData } from "../../../../interfaces";
 import { queryDatabase } from "../../../../utils/database";
+import { getAccessToken } from "../../../../utils/refreshToken";
 
 // TODO: error handling for expired tokens
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    // TOOD: checking of refresh token and retreival of access_token
     // get the refresh_token from req headers
     const { refresh_token } = req.headers;
-    // get the expires_in of the access_token
-    const { expires_in } = await queryDatabase('authTokens', { refresh_token: refresh_token });
-    // check if the token is expired
-    if (Date.now() > parseInt(expires_in.toString())) {
-        // insert an updated entry into database
-        await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
-    }
-    // query database for access_token using the refresh_token
-    const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token });
+    // let access_token: string;
+    // // check if the token is expired
+    // if (checkForRefresh(refresh_token.toString())) {
+    //     // insert an updated entry into database
+    //     const response = await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
+    //     const data = await response.json();
+    //     if (!data.error) {
+    //         access_token = await data.token.access_token;
+    //     } else {
+    //         console.log(data.error);
+    //     }
+    // } else {
+    //     // query database for access_token using the refresh_token
+    //     access_token = await queryDatabase('authTokens', { refresh_token: refresh_token });
+    // }
+
+    // get the access_token associated with the refresh token
+    const access_token = await getAccessToken(refresh_token.toString());
     // get the category id
     const { category_id } = req.query;
     if (category_id === undefined) {
@@ -27,7 +36,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (typeof access_token === 'string' && typeof category_id === 'string') {
         const data = await getCategoryPlaylist(access_token, category_id);
         if (data.length === 0) {
-            res.status(500).json({ error: { status: 500, message: 'internal server error' } })
+            res.status(500).json({ error: { status: 500, message: 'internal server error' } });
         }
         else
             res.status(200).json({ items: data });

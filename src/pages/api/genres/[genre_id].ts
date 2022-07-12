@@ -3,18 +3,20 @@ import { stringify } from "querystring";
 import endpoints from "../../../../endpoints.config";
 import { TrackData } from "../../../../interfaces";
 import { queryDatabase } from "../../../../utils/database";
+import { getAccessToken } from "../../../../utils/refreshToken";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { refresh_token } = req.headers;
     // get the expires_in of the corresponding access_token
-    const { expires_in } = await queryDatabase('authTokens', { refresh_token: refresh_token });
-    // if the access_token is expired, insert an updated entry into database
-    if (Date.now() > parseInt(expires_in.toString())) {
-        await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
-    }
-    // query database for the access_token using the refresh_token
-    const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token });
-    // get the genre_id
+    // const { expires_in } = await queryDatabase('authTokens', { refresh_token: refresh_token });
+    // // if the access_token is expired, insert an updated entry into database
+    // if (Date.now() > parseInt(expires_in.toString())) {
+    //     await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
+    // }
+    // // query database for the access_token using the refresh_token
+    // const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token });
+    // // get the genre_id
+    const access_token = await getAccessToken(refresh_token.toString());
     const { genre_id } = req.query;
     if (genre_id === undefined) {
         res.status(403).json({ error: { status: 403, message: 'invalid genre_id' } });
@@ -23,6 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (typeof access_token === 'string' && typeof genre_id === 'string') {
         const data = await getGenreTracks(access_token, genre_id);
         if (data.length === 0) {
+            console.log('internal server error');
             res.status(500).json({ error: { status: 500, message: 'internal server error' } });
         } else
             res.status(200).json({ items: data });
