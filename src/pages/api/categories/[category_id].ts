@@ -9,28 +9,12 @@ import { getAccessToken } from "../../../../utils/refreshToken";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // get the refresh_token from req headers
     const { refresh_token } = req.headers;
-    // let access_token: string;
-    // // check if the token is expired
-    // if (checkForRefresh(refresh_token.toString())) {
-    //     // insert an updated entry into database
-    //     const response = await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
-    //     const data = await response.json();
-    //     if (!data.error) {
-    //         access_token = await data.token.access_token;
-    //     } else {
-    //         console.log(data.error);
-    //     }
-    // } else {
-    //     // query database for access_token using the refresh_token
-    //     access_token = await queryDatabase('authTokens', { refresh_token: refresh_token });
-    // }
-
     // get the access_token associated with the refresh token
     const access_token = await getAccessToken(refresh_token.toString());
     // get the category id
     const { category_id } = req.query;
     if (category_id === undefined) {
-        res.status(403).json({ error: { status: 403, message: 'invalid category_id' } });
+        res.status(400).json({ error: { status: 400, message: 'invalid category_id' } });
     }
     // retrieve the category's playlist
     if (typeof access_token === 'string' && typeof category_id === 'string') {
@@ -160,7 +144,7 @@ const getPlayListTracks = async (token: string, playlist: SpotifyPlaylist, field
         });
         return listOfPlaylistTracks;
     } catch (error) {
-        // console.log('playlist has no tracks');
+        console.error("Error: ", error);
         return [];
     }
 }

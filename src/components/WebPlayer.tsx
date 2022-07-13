@@ -20,6 +20,7 @@ const WebPlayer = ({ track }: Props) => {
         console.log('current device_id: ', device_id);
         if (!paused) {
             const response = await fetch(`http://localhost:3000/api/playback/pause?device_id=${device_id}`, {
+                method: 'PUT',
                 headers: {
                     refresh_token: Cookie.get('refresh_token')
                 }
@@ -33,6 +34,7 @@ const WebPlayer = ({ track }: Props) => {
                 trackNum: track.trackNum,
             }
             const response = await fetch('http://localhost:3000/api/playback/play?' + stringify(queryParams), {
+                method: 'PUT',
                 headers: {
                     refresh_token: Cookie.get('refresh_token')
                 }

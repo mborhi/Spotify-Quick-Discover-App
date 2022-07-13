@@ -2,24 +2,14 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import endpoints from "../../../../endpoints.config";
 import { TrackData } from "../../../../interfaces";
-import { queryDatabase } from "../../../../utils/database";
 import { getAccessToken } from "../../../../utils/refreshToken";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { refresh_token } = req.headers;
-    // get the expires_in of the corresponding access_token
-    // const { expires_in } = await queryDatabase('authTokens', { refresh_token: refresh_token });
-    // // if the access_token is expired, insert an updated entry into database
-    // if (Date.now() > parseInt(expires_in.toString())) {
-    //     await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
-    // }
-    // // query database for the access_token using the refresh_token
-    // const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token });
-    // // get the genre_id
     const access_token = await getAccessToken(refresh_token.toString());
     const { genre_id } = req.query;
     if (genre_id === undefined) {
-        res.status(403).json({ error: { status: 403, message: 'invalid genre_id' } });
+        res.status(400).json({ error: { status: 400, message: 'invalid genre_id' } });
     }
     // check fo access_token validity and retrieve the songs for this genre
     if (typeof access_token === 'string' && typeof genre_id === 'string') {

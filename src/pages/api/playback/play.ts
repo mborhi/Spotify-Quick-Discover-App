@@ -1,21 +1,21 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import endpointsConfig from "../../../../endpoints.config";
-import { queryDatabase } from "../../../../utils/database";
+import { getAccessToken } from "../../../../utils/refreshToken";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { refresh_token } = req.headers;
-    // handle fetching access_token
-    const { expires_in } = await queryDatabase('authTokens', { refresh_token: refresh_token });
-    // if the access_token is expired, insert an updated entry into database
-    if (Date.now() > parseInt(expires_in.toString())) {
-        await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
+    const access_token = await getAccessToken(refresh_token.toString());
+    // validated access_token
+    if (access_token === undefined) {
+        res.status(401).json({ error: { status: 401, message: "invalid token" } });
+        res.end();
     }
-    // query database for the access_token using the refresh_token
-    const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token });
     // get query params from request
     const { device_id, trackURI, trackNum } = req.query;
-    console.log('received d_id, trUri, trNum: ', device_id, trackURI, trackNum);
+    if (!queryParamsValid(device_id, trackURI, trackNum)) {
+        res.status(400).json({ error: { status: 400, message: "invalid query parameters" } });
+    }
     let reqParams = {
         device_id: device_id
     }
@@ -27,7 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         "position_ms": 0
     }
     let url = endpointsConfig.SpotifyAPIBaseURL + "/me/player/play?" + stringify(reqParams);
-    console.log('playback url: ', url);
+    // console.log('playback url: ', url);
     const response = await fetch(url, {
         method: 'PUT',
         body: JSON.stringify(bodyParams),
@@ -37,8 +37,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             'Authorization': `Bearer ${access_token}`
         }
     });
+    // console.log(await response.json());
+    res.status(200).json({ "message": "playing song" });
+}
 
-    res.json({ "message": "playing song..." });
+const queryParamsValid = (device_id, trackURI, trackNum) => {
+    return (
+        typeof device_id === 'string' && typeof trackURI === 'string' && typeof trackNum === 'string' &&
+        device_id.length !== 0 && trackURI.length !== 0
+    );
 }
 
 export default handler;

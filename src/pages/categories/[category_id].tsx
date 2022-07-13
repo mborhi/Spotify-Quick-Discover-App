@@ -26,12 +26,13 @@ export default function PreviewStack() {
         if (data.items === undefined) {
             setPlaylistTracks([]);
             // TODO: add state for error, which is displayed if playlistTracks is empty
+        } else {
+            setPlaylistTracks(data.items);
         }
-        console.log('data: ', data);
-        setPlaylistTracks(data.items);
     }
 
     const compressPlaylistData = () => {
+        if (playlists.length === 0) return [];
         let compressedListOfPlaylistData = []
         playlists.forEach((playlist) => {
             playlist.playlistTracks.forEach((trackData) => {
