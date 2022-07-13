@@ -1,24 +1,27 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import endpointsConfig from "../../../../endpoints.config";
-import { queryDatabase } from "../../../../utils/database";
+import { getAccessToken } from "../../../../utils/refreshToken";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { refresh_token } = req.headers;
     // handle fetching access_token
-    const { expires_in } = await queryDatabase('authTokens', { refresh_token: refresh_token });
-    // if the access_token is expired, insert an updated entry into database
-    if (Date.now() > parseInt(expires_in.toString())) {
-        await fetch(`http://localhost:3000/api/auth/refresh_token?refresh_token=${refresh_token}`, { method: 'POST' });
+    const access_token = await getAccessToken(refresh_token.toString());
+    // validated access_token
+    if (access_token === undefined) {
+        res.status(401).json({ error: { status: 401, message: "invalid token" } });
+        res.end();
     }
-    // query database for the access_token using the refresh_token
-    const { access_token } = await queryDatabase('authTokens', { refresh_token: refresh_token });
     const { device_id, volume } = req.query;
+    if (!isValidDeviceId(device_id) || !isValidVolume(volume)) {
+        res.status(400).send({ error: { status: 400, message: "invalid query parameters" } });
+        res.end();
+    }
     if (typeof device_id === 'string' && typeof volume === 'string') {
         const response = await changeTrackVolume(access_token, device_id, parseInt(volume));
         res.status(200).send(response);
     } else {
-        res.status(500).send({ "error": "internal server error" });
+        res.status(500).send({ error: { status: 500, message: "internal server error" } });
     }
 }
 
@@ -52,7 +55,6 @@ const baseURL = endpointsConfig.SpotifyAPIBaseURL;
  * @returns json response of success or error
  */
 const changeTrackVolume = async (access_token: string, device_id: string, volume: number) => {
-    console.log('set volume to: ', volume);
     const query = {
         volume_percent: volume,
         device_id: device_id
@@ -72,4 +74,5 @@ const changeTrackVolume = async (access_token: string, device_id: string, volume
         return { "message": "error" };
     }
 }
+
 export default handler;
