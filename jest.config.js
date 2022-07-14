@@ -1,9 +1,3 @@
-// /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-// module.exports = {
-//   preset: 'ts-jest',
-//   testEnvironment: 'node',
-// };
-
 module.exports = {
   collectCoverage: true,
   // on node 14.x coverage provider v8 offers good speed and more or less good report
@@ -35,7 +29,7 @@ module.exports = {
   // Add more setup options before each test is run
   // setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/'],
-  testEnvironment: 'jsdom',
+  // testEnvironment: 'jsdom', (commented out for jest-mongodb)
   transform: {
     // Use babel-jest to transpile tests with the next/babel preset
     // https://jestjs.io/docs/configuration#transform-objectstring-pathtotransformer--pathtotransformer-object
@@ -45,4 +39,5 @@ module.exports = {
     '/node_modules/',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
+  "preset": "@shelf/jest-mongodb"
 }
