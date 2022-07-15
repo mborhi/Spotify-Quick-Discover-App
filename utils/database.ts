@@ -2,13 +2,13 @@ import { MongoClient } from 'mongodb'
 
 const uri = process.env.MONGODB_URI
 
-if (!process.env.MONGODB_URI) {
-    throw new Error('Please add your Mongo URI to .env.local')
-}
+// if (!process.env.MONGODB_URI) {
+//     throw new Error('Please add your Mongo URI to .env.local')
+// }
 
-if (!process.env.MONGODB_DB) {
-    throw new Error('Please define the MONGODB_DB environment variable inside .env.local');
-}
+// if (!process.env.MONGODB_DB) {
+//     throw new Error('Please define the MONGODB_DB environment variable inside .env.local');
+// }
 
 let cached = global.mongo;
 
@@ -43,10 +43,18 @@ export async function connectToDatabase() {
  * Finds one entry using the given query from the specified collection of the database
  * @param collection the collection in the database to query from
  * @param query the search query
+ * @param database optional. the database to query
  * @returns the result of the search
  */
-export const queryDatabase = async (collection: string, query) => {
-    const { db } = await connectToDatabase();
+export const queryDatabase = async (collection: string, query, database = undefined) => {
+    let db;
+    if (database) {
+        db = database;
+    } else {
+        let connection = await connectToDatabase();
+        db = await connection.db;
+    }
+    // const { db } = await connectToDatabase();
     const result = db.collection(collection).findOne(query);
     return await result;
 }

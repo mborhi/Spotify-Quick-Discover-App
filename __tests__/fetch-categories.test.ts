@@ -1,29 +1,3 @@
-// import { MongoClient } from 'mongodb'
-// import { loadCategories } from '../utils/fetch-categories';
-
-// describe('Fetch categories from database or make API call to Spotify', () => {
-//     const uri = process.env.MONGOD_URI;
-//     let connection;
-//     let db;
-
-//     beforeAll(async () => {
-//         connection = MongoClient.connect(uri).then((client) => {
-//             return {
-//                 client,
-//                 db: client.db(process.env.MONGODB_DB),
-//             }
-//         })
-//         db = await connection.db();
-//     });
-
-//     afterAll(async () => {
-//         await connection.close();
-//     });
-
-//     it('should update the categories collection in the database', () => {
-//         expect(1).toEqual(1);
-//     });
-// });
 import { loadCategories } from '../utils/fetch-categories';
 const { MongoClient } = require('mongodb');
 
