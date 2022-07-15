@@ -11,6 +11,9 @@ import {
     Link
 } from '@chakra-ui/react';
 
+/**
+ * Login display
+ */
 const Login = () => {
     return (
         <Flex

@@ -1,5 +1,5 @@
 import { SimpleGrid, Container, Link, Box, Heading } from "@chakra-ui/layout";
-import React, { useEffect } from "react";
+import React from "react";
 import { CollectionMember } from "../../interfaces";
 
 
@@ -8,12 +8,10 @@ type Props = {
     collection: CollectionMember[]
 };
 
-
+/**
+ * Displays the given list of CollectionMembers as clickable items in a grid
+ */
 const CollectionDisplay = ({ collectionName, collection }: Props) => {
-
-    useEffect(() => {
-        // console.log('colleciton display: ', collection);
-    }, [])
 
     return (
         <Container>

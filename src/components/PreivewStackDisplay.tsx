@@ -7,6 +7,9 @@ interface Props {
     changeTrack: (track) => void
 }
 
+/**
+ * Displays MusicPreviewPlayback elements from the given list of TrackData
+ */
 const PreviewStackDisplay = ({ dataList, changeTrack }: Props) => {
 
     return (

@@ -1,9 +1,9 @@
-/**
- * Preview URL playback component
- */
 import { useState } from "react"
 import { Button, ButtonGroup, Heading } from '@chakra-ui/react';
 
+/**
+ * Preview URL playback component
+ */
 const MusicPreviewPlayback = ({ trackData, changeTrack }) => {
 
     const [is_paused, setPaused] = useState(true);
