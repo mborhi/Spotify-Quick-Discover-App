@@ -1,29 +1,25 @@
+import { connectToDatabase } from '../utils/database';
 import { loadCategories } from '../utils/fetch-categories';
 const { MongoClient } = require('mongodb');
 
-describe('insert', () => {
+describe('Fetch categories from database or make Spotify API call', () => {
     let connection;
+    let client;
     let db;
 
     beforeAll(async () => {
-        connection = await MongoClient.connect(globalThis.__MONGO_URI__, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-        db = await connection.db(globalThis.__MONGO_DB_NAME__);
+        connection = await connectToDatabase();
+        db = await connection.db;
+        client = await connection.client;
     });
 
     afterAll(async () => {
-        await connection.close();
+        await client.close();
     });
 
-    it('should insert a doc into collection', async () => {
-        const users = db.collection('users');
-
-        const mockUser = { _id: 'some-user-id', name: 'John' };
-        await users.insertOne(mockUser);
-
-        const insertedUser = await users.findOne({ _id: 'some-user-id' });
-        expect(insertedUser).toEqual(mockUser);
+    it('correctly retreives all categories from the database', async () => {
+        const categories = await loadCategories(db);
+        // the retreived categories should always include 50 elements, the number of categories maintained by Spotify
+        expect(categories.length).toEqual(50);
     });
 });
