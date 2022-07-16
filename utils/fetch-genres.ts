@@ -5,20 +5,38 @@ import endpoints from "../endpoints.config";
 
 /**
  * Retrieves a list of genres
+ * @param {database} [database] optional. the database to load genres from
  * @returns {Promise<CollectionMember[]>} the list of genres
  */
-export const loadGenres = async (): Promise<CollectionMember[]> => {
-    const { db } = await connectToDatabase();
+export const loadGenres = async (database = undefined): Promise<CollectionMember[]> => {
+    // const { db } = await connectToDatabase();
+    let db;
+    if (database) {
+        db = database;
+    } else {
+        let connection = await connectToDatabase();
+        db = await connection.db;
+    }
     const data = await db.collection('genres').find({}).toArray();
+    const genreUpdates = await db.collection('collectionsUpdates').findOne({ name: "genres" });
+    // the time when the genres collection was last updated 
+    // TODO: store this in cache maybe
+    const lastUpdated = await genreUpdates.last_updated;
     let result = await data;
     // add handling here for empty results, if the results are empty fetch from spotify
-    if (result.length === 0) {
+    if (result.length === 0 || Date.now() - lastUpdated > 3600 * 1000) { // if the database hasn't been updated in one hour
+        console.log('re-validated genres collection...');
         // retrieve the application access token
         const token = await getAuthToken(); // TODO: store this in database
         // make request for genre seeds
         result = await getAvailableGenreSeeds(token);
-        // insert genres into data base
-        db.collection('genres').insertMany(result);
+        // clear out all genres in the database
+        await db.collection('genres').deleteMany({});
+        // insert genres into database
+        await db.collection('genres').insertMany(result);
+        // replace the old timestamp with current time
+        // await db.collection('genreUpdates').deleteMany({});
+        await db.collection('collectionsUpdates').replaceOne({ name: "genres" }, { name: "genres", last_updated: Date.now() });
     }
     return JSON.parse(JSON.stringify(result));
 }

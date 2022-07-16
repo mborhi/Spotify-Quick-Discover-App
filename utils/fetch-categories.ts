@@ -6,20 +6,36 @@ import { stringify } from "querystring";
 
 /**
  * Retrieves a list of categories 
+ * @param {database} [database] optional. the database to load categories from
  * @returns {Promise<CollectionMember[]>} the list of categories
  */
-export const loadCategories = async (): Promise<CollectionMember[]> => {
-    const { db } = await connectToDatabase();
+export const loadCategories = async (database = undefined): Promise<CollectionMember[]> => {
+    // const { db } = await connectToDatabase();
+    let db;
+    if (database) {
+        db = database;
+    } else {
+        let connection = await connectToDatabase();
+        db = await connection.db;
+    }
     const data = await db.collection('categories').find({}).limit(50).toArray();
     let result = await data;
-    // if the results are empty fetch from spotify and store results in database
-    if (result.length === 0) {
+    // get the time categories was last updated
+    const categoriesUpdates = await db.collection('collectionsUpdates').findOne({ name: "categories" });
+    const lastUpdated = await categoriesUpdates.last_updated;
+    // if the results are empty or database hasn't been updated, fetch from spotify and store results in database
+    if (result.length === 0 || Date.now() - lastUpdated > 3600 * 1000) { // revalidate after one hour
+        console.log('revalidating categories...');
         // get auth token
         const token = await getAuthToken();
         // make request for categories
         result = await getCategories(token);
+        // purge all old data
+        await db.collection('categories').deleteMany({});
         // insert into database
-        db.collection('categories').insertMany(result);
+        await db.collection('categories').insertMany(result);
+        // replace the old categories update
+        await db.collection('collectionsUpdates').replaceOne({ name: "categories" }, { name: "categories", last_updated: Date.now() });
     }
     return JSON.parse(JSON.stringify(result));
 }
@@ -59,6 +75,7 @@ export const getCategories = async (token: string, country: string = 'US', local
     // console.log('response: ', await response.json());
     try {
         const data = await response.json();
+        // console.log('received data: ', await data);
         const categories: CollectionMember[] = await data.categories.items;
         return categories;
     } catch (error) {
