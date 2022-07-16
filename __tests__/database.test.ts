@@ -1,4 +1,4 @@
-import { queryDatabase } from "../utils/database";
+import { connectToDatabase, queryDatabase } from "../utils/database";
 const { MongoClient } = require('mongodb');
 
 describe('Query Database', () => {
@@ -42,4 +42,21 @@ describe('Query Database', () => {
         const result = await queryDatabase('tokens', { "refresh_token": "non-existent" }, db);
         expect(result).toEqual({ "error": "no results match query" });
     });
+});
+
+describe("Connect to Database", () => {
+
+    it("correctly connects to the database in .env.local file", async () => {
+        expect.assertions(1);
+        const { db, client } = await connectToDatabase();
+        expect(await db).toBeTruthy();
+        await client.close();
+    });
+
+    // it("correctly catches an error if database env is not configured", async () => {
+
+    //     const { db } = await connectToDatabase();
+
+    // });
+
 });

@@ -1,11 +1,11 @@
 import { MongoClient } from 'mongodb'
+import endpoints from '../endpoints.config';
 
-const uri = process.env.MONGODB_URI
+const uri = endpoints.MongoURI;
 
-// if (!process.env.MONGODB_URI) {
-//     throw new Error('Please add your Mongo URI to .env.local')
-// }
-
+if (!uri) {
+    throw new Error('Please add your Mongo URI to .env.local')
+}
 // if (!process.env.MONGODB_DB) {
 //     throw new Error('Please define the MONGODB_DB environment variable inside .env.local');
 // }
@@ -56,5 +56,9 @@ export const queryDatabase = async (collection: string, query, database = undefi
     }
     // const { db } = await connectToDatabase();
     const result = db.collection(collection).findOne(query);
-    return await result;
+    const data = await result;
+    if (!data) {
+        return { "error": "no results match query" };
+    }
+    return data;
 }
