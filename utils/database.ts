@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb'
+import { Db, MongoClient } from 'mongodb'
 import endpoints from '../endpoints.config';
 
 const uri = endpoints.MongoURI;
@@ -41,13 +41,13 @@ export async function connectToDatabase() {
 
 /**
  * Finds one entry using the given query from the specified collection of the database
- * @param collection the collection in the database to query from
- * @param query the search query
- * @param database optional. the database to query
+ * @param {string} collection the collection in the database to query from
+ * @param {any} query the search query
+ * @param {Db} [database = undefined] the database to query
  * @returns the result of the search
  */
-export const queryDatabase = async (collection: string, query, database = undefined) => {
-    let db;
+export const queryDatabase = async (collection: string, query, database: Db = undefined) => {
+    let db: Db;
     if (database) {
         db = database;
     } else {
@@ -55,9 +55,9 @@ export const queryDatabase = async (collection: string, query, database = undefi
         db = await connection.db;
     }
     // const { db } = await connectToDatabase();
-    const result = db.collection(collection).findOne(query);
+    const result = await db.collection(collection).findOne(query);
     const data = await result;
-    if (!data) {
+    if (data === null) {
         return { "error": "no results match query" };
     }
     return data;

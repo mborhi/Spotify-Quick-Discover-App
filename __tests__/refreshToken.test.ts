@@ -33,7 +33,7 @@ describe('Test checkForRefresh token expiration', () => {
         };
         // insert mock token into mock db 
         await db.collection("authTokens").insertOne(mockToken);
-        const expired = checkForRefresh("abc", db);
+        const expired = await checkForRefresh("abc", db);
         expect(expired).toBe(true);
     });
 
@@ -46,7 +46,7 @@ describe('Test checkForRefresh token expiration', () => {
             "expires_in": Date.now() + 3600 * 1000  // one hour ahead of current time
         };
         await db.collection('authTokens').insertOne(mockToken);
-        const expired = checkForRefresh("abc", db);
+        const expired = await checkForRefresh("abc", db);
         expect(expired).toBe(false);
     })
 

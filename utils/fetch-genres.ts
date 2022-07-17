@@ -55,7 +55,6 @@ export const loadGenres = async (database = undefined): Promise<CollectionMember
  * @returns {array}         list of genres
  */
 const getAvailableGenreSeeds = async (token: string): Promise<CollectionMember[]> => {
-    console.log('getting available genre seeds...');
     const url = endpoints.SpotifyAPIBaseURL + '/recommendations/available-genre-seeds';
     const response = await fetch(url, {
         method: 'GET',

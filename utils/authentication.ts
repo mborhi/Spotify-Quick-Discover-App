@@ -21,7 +21,6 @@ const getAuthToken = async () => {
     try {
         let token = await data.access_token;
         const result = await token;
-        console.log(result);
         return await result;
     }
     catch (error) {
