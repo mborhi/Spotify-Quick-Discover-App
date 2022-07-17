@@ -25,7 +25,6 @@ export const loadGenres = async (database = undefined): Promise<CollectionMember
     let result = await data;
     // add handling here for empty results, if the results are empty fetch from spotify
     if (result.length === 0 || Date.now() - lastUpdated > 3600 * 1000) { // if the database hasn't been updated in one hour
-        console.log('re-validated genres collection...');
         // retrieve the application access token
         const token = await getAuthToken(); // TODO: store this in database
         // make request for genre seeds

@@ -25,7 +25,6 @@ export const loadCategories = async (database = undefined): Promise<CollectionMe
     const lastUpdated = await categoriesUpdates.last_updated;
     // if the results are empty or database hasn't been updated, fetch from spotify and store results in database
     if (result.length === 0 || Date.now() - lastUpdated > 3600 * 1000) { // revalidate after one hour
-        console.log('revalidating categories...');
         // get auth token
         const token = await getAuthToken();
         // make request for categories

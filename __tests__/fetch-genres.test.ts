@@ -3,7 +3,7 @@ import { resolve } from "path/posix";
 import { connectToDatabase } from "../utils/database";
 import { loadGenres } from "../utils/fetch-genres";
 
-describe('Fetch genres from database or make Spotify API call', () => {
+describe("Fetch genres from database or make Spotify API call", () => {
     let connection;
     let client;
     let db;
@@ -18,16 +18,14 @@ describe('Fetch genres from database or make Spotify API call', () => {
         await client.close();
     });
 
-    it('correctly retreives all genres from the database', async () => {
+    it("correctly retreives all genres from the database", async () => {
         const genres = await loadGenres(db);
         // the retreived genres should always have a length of 126, the number of genres maintained by Spotify 
         expect(genres.length).toEqual(126);
     });
 });
 
-// TODO: figure out a way to mock http requests, atm time stamp update only occurs after http request is made to spotify api
-
-describe("Collections revalidation", () => {
+describe("Genre collection revalidation", () => {
     let connection;
     let db;
 
@@ -37,7 +35,7 @@ describe("Collections revalidation", () => {
         // mock fetch
         global.fetch = jest.fn(() =>
             Promise.resolve({
-                json: () => Promise.resolve({ test: 100 }),
+                json: () => Promise.resolve({ genres: ['mockGenre'] }),
             }),
         ) as jest.Mock;
     });
@@ -50,6 +48,11 @@ describe("Collections revalidation", () => {
         db = await connection.db(globalThis.__MONGO_DB_NAME__);
     });
 
+    beforeEach(async () => {
+        await db.collection('genres').deleteMany({});
+        await db.collection('collectionsUpdates').deleteMany({});
+    })
+
     afterAll(() => {
         // restore fetch
         global.fetch = unmockedFetch
@@ -61,7 +64,7 @@ describe("Collections revalidation", () => {
         await connection.close();
     });
 
-    it('correctly updates genres last_updated date after collection revalidation', async () => {
+    it("correctly updates genres last_updated timestamp after one hour", async () => {
         const lastUpdates = {
             name: "genres",
             last_updated: 10
@@ -79,5 +82,24 @@ describe("Collections revalidation", () => {
 
         expect(last_updated).toBeGreaterThanOrEqual(Date.now() - 2000);
         expect(last_updated).toBeLessThan(Date.now() + 2000);
+    });
+
+    it("correctly refreshes genres after one hour", async () => {
+        const lastUpdates = {
+            name: "genres",
+            last_updated: 10 // low number to simulate expiration
+        };
+        // this is the only document that is in genres collections before re-validation
+        const mockOldCategory = {
+            id: "acoustic",
+            name: "acoustic",
+        }
+        await db.collection('genres').insertOne(mockOldCategory);
+        await db.collection('collectionsUpdates').insertOne(lastUpdates);
+        // load genres to update collection
+        await loadGenres(db);
+        const genres = await db.collection('genres').find({}).toArray();
+        expect(await genres[0].id).toEqual("mockGenre");
+        expect(await genres[0].name).toEqual("mockGenre");
     });
 });
