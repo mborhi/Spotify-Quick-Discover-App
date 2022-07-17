@@ -13,12 +13,10 @@ describe('Query Database', () => {
     }
 
     beforeAll(async () => {
-        console.log('before all');
         connection = await MongoClient.connect(globalThis.__MONGO_URI__, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
-        // console.log('connection: ', connection);
         db = await connection.db(globalThis.__MONGO_DB_NAME__);
     });
 
@@ -31,7 +29,6 @@ describe('Query Database', () => {
     });
 
     it('correctly returns a the specified token', async () => {
-        console.log('running the test');
         await db.collection('tokens').insertOne(mockToken);
         const result = await queryDatabase('tokens', { "refresh_token": "mock-refresh-token" }, db);
         expect(result).toEqual(mockToken);

@@ -48,7 +48,7 @@ describe("Genre collection revalidation", () => {
         db = await connection.db(globalThis.__MONGO_DB_NAME__);
     });
 
-    beforeEach(async () => {
+    afterEach(async () => {
         await db.collection('genres').deleteMany({});
         await db.collection('collectionsUpdates').deleteMany({});
     })
