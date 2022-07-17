@@ -1,12 +1,13 @@
 const { MongoClient } = require('mongodb');
+import { Db, MongoClient as Client } from "mongodb";
 import { resolve } from "path/posix";
 import { connectToDatabase } from "../utils/database";
 import { loadGenres } from "../utils/fetch-genres";
 
 describe("Fetch genres from database or make Spotify API call", () => {
     let connection;
-    let client;
-    let db;
+    let client: Client;
+    let db: Db;
 
     beforeAll(async () => {
         connection = await connectToDatabase();
@@ -27,7 +28,7 @@ describe("Fetch genres from database or make Spotify API call", () => {
 
 describe("Genre collection revalidation", () => {
     let connection;
-    let db;
+    let db: Db;
 
     const unmockedFetch = global.fetch
 

@@ -1,11 +1,12 @@
+import { Db, MongoClient as Client } from 'mongodb';
 import { connectToDatabase } from '../utils/database';
 import { loadCategories } from '../utils/fetch-categories';
 const { MongoClient } = require('mongodb');
 
 describe("Fetch categories from database or make Spotify API call", () => {
     let connection;
-    let client;
-    let db;
+    let client: Client;
+    let db: Db;
 
     const unmockedFetch = global.fetch
 
@@ -44,7 +45,7 @@ describe("Fetch categories from database or make Spotify API call", () => {
 describe("Categories collection revalidation", () => {
 
     let connection;
-    let db;
+    let db: Db;
     const mockCategory = {
         "href": "https://api.spotify.com/v1/browse/categories/pop",
         "icons": [{

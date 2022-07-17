@@ -1,9 +1,10 @@
+import { Db, MongoClient as Client } from "mongodb";
 import { connectToDatabase, queryDatabase } from "../utils/database";
 const { MongoClient } = require('mongodb');
 
 describe('Query Database', () => {
     let connection;
-    let db;
+    let db: Db;
     const mockToken = {
         "access_token": "mock-access-token",
         "token_type": "Bearer",

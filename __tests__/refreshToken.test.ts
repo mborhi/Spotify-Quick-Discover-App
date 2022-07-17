@@ -1,10 +1,11 @@
+import { Db, MongoClient as Client } from "mongodb";
 import { checkForRefresh } from "../utils/refreshToken";
 const { MongoClient } = require('mongodb');
 
 describe('Test checkForRefresh token expiration', () => {
 
     let connection;
-    let db;
+    let db: Db;
 
     beforeAll(async () => {
         connection = await MongoClient.connect(globalThis.__MONGO_URI__, {
