@@ -1,4 +1,5 @@
 const { MongoClient } = require('mongodb');
+import { resolve } from "path/posix";
 import { connectToDatabase } from "../utils/database";
 import { loadGenres } from "../utils/fetch-genres";
 
@@ -25,10 +26,21 @@ describe('Fetch genres from database or make Spotify API call', () => {
 });
 
 // TODO: figure out a way to mock http requests, atm time stamp update only occurs after http request is made to spotify api
-/*
+
 describe("Collections revalidation", () => {
     let connection;
     let db;
+
+    const unmockedFetch = global.fetch
+
+    beforeAll(() => {
+        // mock fetch
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({ test: 100 }),
+            }),
+        ) as jest.Mock;
+    });
 
     beforeAll(async () => {
         connection = await MongoClient.connect(globalThis.__MONGO_URI__, {
@@ -38,7 +50,14 @@ describe("Collections revalidation", () => {
         db = await connection.db(globalThis.__MONGO_DB_NAME__);
     });
 
+    afterAll(() => {
+        // restore fetch
+        global.fetch = unmockedFetch
+        jest.restoreAllMocks();
+    });
+
     afterAll(async () => {
+        // close db connection
         await connection.close();
     });
 
@@ -47,6 +66,11 @@ describe("Collections revalidation", () => {
             name: "genres",
             last_updated: 10
         };
+        const mockGenre = {
+            id: "acoustic",
+            name: "acoustic",
+        };
+        await db.collection('genres').insertOne(mockGenre);
         await db.collection('collectionsUpdates').insertOne(lastUpdates);
         // load genres to trigger revalidatation
         await loadGenres(db);
@@ -57,4 +81,3 @@ describe("Collections revalidation", () => {
         expect(last_updated).toBeLessThan(Date.now() + 2000);
     });
 });
-*/

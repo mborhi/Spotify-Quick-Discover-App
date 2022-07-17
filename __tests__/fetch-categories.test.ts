@@ -7,10 +7,27 @@ describe('Fetch categories from database or make Spotify API call', () => {
     let client;
     let db;
 
+    const unmockedFetch = global.fetch
+
+    beforeAll(() => {
+        // mock fetch
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({ test: 100 }),
+            }),
+        ) as jest.Mock;
+    });
+
     beforeAll(async () => {
         connection = await connectToDatabase();
         db = await connection.db;
         client = await connection.client;
+    });
+
+    afterAll(() => {
+        // restore fetch
+        global.fetch = unmockedFetch
+        jest.restoreAllMocks();
     });
 
     afterAll(async () => {
