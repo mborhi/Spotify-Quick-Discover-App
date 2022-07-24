@@ -5,13 +5,17 @@ import { queryDatabase } from "./database";
  * Determines whether the access token associated with the provided refresh token is expired
  * @param {string} refresh_token the OAuth2 refresh token
  * @param {Db} [database = undefined] the database to check refresh token in
- * @returns {Promise<string>} whether the OAuth2 access token is expired
+ * @returns {Promise<boolean>} whether the OAuth2 access token is expired
  */
 export const checkForRefresh = async (refresh_token: string, database: Db = undefined): Promise<boolean> => {
     // get the expires_in of the access_token
-    const { expires_in } = await queryDatabase('authTokens', { refresh_token: refresh_token }, database);
-    // return whether the token is expired
-    return Date.now() > parseInt(expires_in.toString());
+    try {
+        const { expires_in } = await queryDatabase('authTokens', { refresh_token: refresh_token }, database);
+        // return whether the token is expired
+        return Date.now() > parseInt(expires_in.toString());
+    } catch (error) {
+        return false;
+    }
 }
 
 /**

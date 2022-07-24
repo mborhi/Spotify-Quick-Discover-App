@@ -127,7 +127,8 @@ const getPlayListTracks = async (token: string, playlist: SpotifyPlaylist, field
             'Authorization': 'Bearer ' + token
         }
     });
-    const data = await response.json();
+    const res = await response.json();
+    const data = await checkFetch(res);
     try {
         let playlistTracks = await data.tracks.items; // list of spotify_tracks
         // for every track in tracks, get the name of the track and the preview url
@@ -147,6 +148,14 @@ const getPlayListTracks = async (token: string, playlist: SpotifyPlaylist, field
         console.error("Error: ", error);
         return [];
     }
+}
+
+const checkFetch = (response) => {
+    if (response.error) {
+        // if error is 404, revalidated
+        console.log(response.error);
+    }
+    return response;
 }
 
 export default handler;

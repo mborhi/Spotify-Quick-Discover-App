@@ -58,7 +58,8 @@ export const queryDatabase = async (collection: string, query, database: Db = un
     const result = await db.collection(collection).findOne(query);
     const data = await result;
     if (data === null) {
-        return { "error": "no results match query" };
+        throw new Error("no results match query");
+        // return { "error": "no results match query" };
     }
     return data;
 }

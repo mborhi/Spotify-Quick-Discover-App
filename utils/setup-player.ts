@@ -1,4 +1,5 @@
 import Cookie from 'js-cookie';
+// TODO: use the Next.js <Script> element to add script to page
 
 const setupPlayer = (access_token) => {
     const script = document.createElement("script");
