@@ -1,14 +1,22 @@
 import { Db, MongoClient as Client } from 'mongodb';
-import { connectToDatabase } from '../utils/database';
 import { loadCategories } from '../utils/fetch-categories';
 const { MongoClient } = require('mongodb');
 
 describe("Fetch categories from database or make Spotify API call", () => {
     let connection;
-    let client: Client;
     let db: Db;
+    const expectedLength = 50;
 
-    const unmockedFetch = global.fetch
+    const unmockedFetch = global.fetch;
+
+    const generateMockCategories = (length: number) => {
+        const mocks = [...Array(length).fill(1)].map((e, idx) => {
+            return {
+                "name": "mock_category" + idx
+            }
+        });
+        return mocks
+    }
 
     beforeAll(() => {
         // mock fetch
@@ -20,9 +28,12 @@ describe("Fetch categories from database or make Spotify API call", () => {
     });
 
     beforeAll(async () => {
-        connection = await connectToDatabase();
-        db = await connection.db;
-        client = await connection.client;
+        connection = await MongoClient.connect(globalThis.__MONGO_URI__, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        db = await connection.db(globalThis.__MONGO_DB_NAME__);
+
     });
 
     afterAll(() => {
@@ -32,13 +43,18 @@ describe("Fetch categories from database or make Spotify API call", () => {
     });
 
     afterAll(async () => {
-        await client.close();
+        await connection.close();
     });
 
     it('correctly retreives all categories from the database', async () => {
+        // load category entries into database
+        const mockCategories = generateMockCategories(expectedLength);
+        await db.collection("categories").insertMany(mockCategories);
+        // set expire time for categories
+        await db.collection("collectionsUpdates").insertOne({ name: "categories", last_updated: Date.now() });
         const categories = await loadCategories(db);
         // the retreived categories should always include 50 elements, the number of categories maintained by Spotify
-        expect(categories.length).toEqual(50);
+        expect(categories.length).toEqual(expectedLength);
     });
 });
 

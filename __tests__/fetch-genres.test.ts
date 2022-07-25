@@ -6,20 +6,55 @@ import { loadGenres } from "../utils/fetch-genres";
 
 describe("Fetch genres from database or make Spotify API call", () => {
     let connection;
-    let client: Client;
     let db: Db;
+    const expectedLength = 126;
+
+    const unmockedFetch = global.fetch;
+
+    const generateMockGenres = (length: number) => {
+        const mocks = [...Array(length).fill(1)].map((e, idx) => {
+            return {
+                "name": "mock_genres" + idx
+            }
+        });
+        return mocks
+    }
+
+    beforeAll(() => {
+        // mock fetch
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({ test: 100 }),
+            }),
+        ) as jest.Mock;
+    });
 
     beforeAll(async () => {
-        connection = await connectToDatabase();
-        db = await connection.db;
-        client = await connection.client;
+        connection = await MongoClient.connect(globalThis.__MONGO_URI__, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        db = await connection.db(globalThis.__MONGO_DB_NAME__);
+
+    });
+
+    afterAll(() => {
+        // restore fetch
+        global.fetch = unmockedFetch
+        jest.restoreAllMocks();
     });
 
     afterAll(async () => {
-        await client.close();
+        await connection.close();
     });
 
+    /**
+     * This requires that entries be loaded into the mock database
+     */
     it("correctly retreives all genres from the database", async () => {
+        const mockGenres = generateMockGenres(expectedLength);
+        await db.collection('genres').insertMany(mockGenres);
+        await db.collection('collectionsUpdates').insertOne({ "name": "genres", "last_updated": Date.now() });
         const genres = await loadGenres(db);
         // the retreived genres should always have a length of 126, the number of genres maintained by Spotify 
         expect(genres.length).toEqual(126);
