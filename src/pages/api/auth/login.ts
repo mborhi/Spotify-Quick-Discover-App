@@ -10,7 +10,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     // get scope and state
     const scope = "streaming \
                 user-read-private \
-                user-read-email";
+                user-read-email \
+                playlist-read-collaborative \
+                playlist-modify-public \
+                playlist-read-private \
+                playlist-modify-private";
 
     const state = generateState(16);
     let params = {
