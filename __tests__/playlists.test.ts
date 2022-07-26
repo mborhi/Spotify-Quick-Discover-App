@@ -1,4 +1,4 @@
-import { filterTracksToAdd } from "../utils/paylists";
+import { filterTracksToAdd } from "../utils/playlists";
 
 describe("Filter tracks to add to playlist", () => {
     it("correctly returns array of track uris which aren't in the playlist tracks", () => {

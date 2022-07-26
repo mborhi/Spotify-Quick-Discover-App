@@ -47,6 +47,8 @@ export interface SpotifyPlaylist {
     url: string
 }
 
+// TODO: add interface for Track
+
 export interface TrackData {
     name: string
     previewURL: string
@@ -58,5 +60,29 @@ export interface TrackData {
 export interface CollectionMember {
     id: string
     name: string
+}
 
+// export interface ApiError {
+//     error: {
+//         status: number
+//         message: string
+//     }
+// }
+
+export type ApiError = {
+    error: {
+        status: number
+        message: string
+    }
+}
+
+export const isResponseError = (response: any): response is ApiError => {
+    return (response as ApiError).error !== undefined;
+}
+
+export interface ApiSuccess {
+    success: {
+        status: number
+        message: string
+    }
 }
