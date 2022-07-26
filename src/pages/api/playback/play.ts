@@ -20,10 +20,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         device_id: device_id
     }
     const bodyParams = {
-        "context_uri": trackURI,
-        "offset": {
-            "position": parseInt(trackNum.toString()) - 1
-        },
+        // "context_uri": trackURI,
+        // "offset": {
+        //     "position": parseInt(trackNum.toString()) - 1
+        // },
+        "uris": [trackURI],
         "position_ms": 0
     }
     let url = endpointsConfig.SpotifyAPIBaseURL + "/me/player/play?" + stringify(reqParams);

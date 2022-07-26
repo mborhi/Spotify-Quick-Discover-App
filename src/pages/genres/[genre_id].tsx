@@ -29,9 +29,11 @@ const GenreTracks = () => {
         let data = await response.json();
         if (data.items === undefined) {
             setTracks([]);
+        } else if (data.error) {
+            setTracks([]);
+        } else {
+            setTracks(data.items);
         }
-        console.log('the received track data: ', data);
-        setTracks(data.items);
     }
 
     const getAccessToken = async () => {

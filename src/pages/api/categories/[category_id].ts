@@ -136,7 +136,7 @@ const getPlayListTracks = async (token: string, playlist: SpotifyPlaylist, field
             let trackData = {
                 name: playlistTrack.track.name,
                 previewURL: playlistTrack.track.preview_url,
-                trackURI: playlistTrack.track.album.uri,
+                trackURI: playlistTrack.track.uri, // changed from track.album.uri
                 trackNum: playlistTrack.track.track_number,
                 trackAlbumImage: playlistTrack.track.album.images[0].url
             };

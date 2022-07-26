@@ -41,7 +41,7 @@ const getGenreTracks = async (token: string, genre: string): Promise<TrackData[]
         return {
             name: item.name,
             previewURL: item.preview_url,
-            trackURI: item.album.uri,
+            trackURI: item.uri, // changed from item.album.uri
             trackNum: item.track_number,
             trackAlbumImage: item.album.images[0].url
         };
