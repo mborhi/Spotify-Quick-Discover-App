@@ -1,12 +1,14 @@
 import endpoints from "../endpoints.config";
+import { isResponseError, SpotifyPlaylist } from "../interfaces";
 
 // TODO: add error handling
 /**
- * Retrieves the current users id
- * @param refresh_token the current users OAuth2 refresh token
- * @returns the current users id
+ * Retrieves the current user's id
+ * 
+ * @param {string} refresh_token the current users OAuth2 refresh token
+ * @returns {Promsie<string>}the current users id
  */
-export const getUserId = async (refresh_token) => {
+export const getUserId = async (refresh_token: string): Promise<string> => {
     const userProfile = await fetch(`${endpoints.ServerURL}/api/user`, {
         method: "GET",
         headers: {
@@ -14,17 +16,31 @@ export const getUserId = async (refresh_token) => {
         }
     });
     const profileData = await userProfile.json();
-    const userId = await profileData.id;
-    return userId;
+    if (isResponseError(profileData)) {
+        throw new Error("Internal server error, unable to retrieve the user's ID");
+    } else {
+        const userId = await profileData.id;
+        return userId;
+    }
 }
 
 /**
  * Retrieves all of the specified users playlists
- * @param access_token the users access token
- * @param userId the users id
- * @returns the user's playlists
+ * 
+ * Uses the Get User's Playlist Spotify Web API call:
+ * 
+ * API Reference	https://developer.spotify.com/documentation/web-api/reference/#/operations/get-list-users-playlists
+ * 
+ * Endpoint	        https://api.spotify.com/v1/users/{user_id}/playlists
+ * 
+ * HTTP Method	    GET
+ * 
+ * OAuth	        Required
+ * @param {string} access_token the users access token
+ * @param {string} userId the users id
+ * @returns {Promise<SpotifyPlaylist[]>} the user's playlists
  */
-export const getUserPlaylist = async (access_token, userId) => {
+export const getUserPlaylists = async (access_token: string, userId: string): Promise<SpotifyPlaylist[]> => {
     const response = await fetch(`${endpoints.SpotifyAPIBaseURL}/users/${userId}/playlists`, {
         method: "GET",
         headers: {
