@@ -1,7 +1,6 @@
 import { SpotifyPlaylist } from "../interfaces";
 import endpoints from "../endpoints.config";
-import { getAccessToken } from "./refreshToken";
-import { getUserPlaylists } from "./user";
+import { getUserId, getUserPlaylists } from "./user";
 
 /**
  * Determines whether any of the tracks exist
@@ -20,17 +19,15 @@ export const checkPlaylistContains = (playlist: SpotifyPlaylist, tracks: string)
     return exists;
 }
 
-export const addOrCreatePlaylist = async (refresh_token) => {
-    const userProfile = await fetch(`${endpoints.ServerURL}/api/user`, {
-        method: "GET",
-        headers: {
-            refresh_token: refresh_token.toString()
-        }
-    });
-    const profileData = await userProfile.json();
-    const userId = await profileData.id;
-    // get the playlist of the user
-    const access_token = await getAccessToken(refresh_token.toString());
+/**
+ * Returns either a newly created or the existing SpotifyQuickDiscover App Finds playlist of the user
+ * @param {string} refresh_token the OAuth2 refresh token of the user
+ * @param {string} access_token the OAuth2 access token of the user
+ * @returns {Promise<SpotifyPlaylist>}the SpotifyQuickDiscover App Finds playlist of the user
+ */
+export const getUserQuickDiscoverPlaylist = async (refresh_token: string, access_token: string) => {
+    const userId = await getUserId(refresh_token);
+    // get the playlists of the user
     const playlists = await getUserPlaylists(access_token, userId);
     let playlist;
     playlists.forEach(p => {
@@ -42,7 +39,13 @@ export const addOrCreatePlaylist = async (refresh_token) => {
     return playlist;
 }
 
-export const createNewPlaylist = async (access_token, userId) => {
+/**
+ * Creates a new playlist with the name SpotifyQuickDiscover App Finds 
+ * @param {string} access_token the OAuth2 access token of the user
+ * @param {string} userId the user's id
+ * @returns {Promise<SpotifyPlaylist>} the newly created playlist
+ */
+export const createNewPlaylist = async (access_token: string, userId: string): Promise<SpotifyPlaylist> => {
     const params = {
         "name": "SpotifyQuickDiscover App Finds",
         "description": "Songs discovered through the SpotifyQuickDiscoverApp",

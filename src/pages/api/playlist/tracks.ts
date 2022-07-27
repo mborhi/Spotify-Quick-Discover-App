@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { stringify } from "querystring";
 import endpoints from "../../../../endpoints.config";
 import { ApiError, isResponseError } from "../../../../interfaces";
-import { filterTracksToAdd } from "../../../../utils/playlists";
+import { getUserQuickDiscoverPlaylist, filterTracksToAdd } from "../../../../utils/playlists";
 import { getAccessToken } from "../../../../utils/refreshToken";
 import { getUserId, getUserPlaylists } from "../../../../utils/user";
 
@@ -11,20 +11,19 @@ import { getUserId, getUserPlaylists } from "../../../../utils/user";
  * GET: retrieve all playlist trakcs
  */
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    const { refresh_token } = req.headers;
-    const access_token = await getAccessToken(refresh_token as string);
-    const userId = await getUserId(refresh_token);
-    const playlists = await getUserPlaylists(access_token, userId);
-    let playlistId;
-    playlists.forEach((playlist) => {
-        if (playlist.name === "SpotifyQuickDiscover App Finds") playlistId = playlist.id;
-    });
-    let quickDiscoverPlaylistTracks = await getPlaylistTracks(playlistId, access_token);
+    const refresh_token = String(req.headers.refresh_token);
+    const access_token = await getAccessToken(refresh_token);
+    // get the required playlist information
+    const playlist = await getUserQuickDiscoverPlaylist(refresh_token, access_token);
+    const playlist_id = await playlist.id;
+    let quickDiscoverPlaylistTracks = await getPlaylistTracks(playlist_id, access_token);
+    // handle requests
     let data;
     if (req.method === "POST") {
         const { tracks } = req.query;
         const tracksToAdd = filterTracksToAdd(tracks, quickDiscoverPlaylistTracks);
-        const result = await addToPlaylist(access_token, playlistId, tracksToAdd);
+
+        const result = await addToPlaylist(access_token, playlist_id, tracksToAdd);
         if (!isResponseError(result)) {
             data = {
                 "success": {
@@ -75,6 +74,7 @@ const addToPlaylist = async (access_token: string, playlistId: string, tracks: s
         position: 0,
         uris: trackUris
     }
+    console.log('track uris: ', trackUris);
     const url = `${endpoints.SpotifyAPIBaseURL}/playlists/${playlistId}/tracks?` + stringify(queryParams);
     const response = await fetch(url, {
         method: "POST",

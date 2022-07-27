@@ -6,7 +6,7 @@ import { getUserPlaylists } from "../../../../utils/user";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
-    const { refresh_token, track_uris } = req.headers;
+    const { refresh_token } = req.headers;
     // get the associated user
     const userProfile = await fetch(`${endpoints.ServerURL}/api/user`, {
         method: "GET",
@@ -24,7 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         if (p.name === "SpotifyQuickDiscover App Finds") playlist = p;
     });
     if (playlist === undefined) {
-        playlist = await createNewPlaylist(access_token, userId);
+        // playlist = await createNewPlaylist(access_token, userId);
     }
     console.log('after adding: ', playlist);
     // update the playlist with the song
@@ -36,24 +36,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 
 
-const createNewPlaylist = async (access_token, userId) => {
-    const params = {
-        "name": "SpotifyQuickDiscover App Finds",
-        "description": "Songs discovered through the SpotifyQuickDiscoverApp",
-        "public": false
-    }
-    const url = `${endpoints.SpotifyAPIBaseURL}/users/${userId}/playlists`;
-    const response = await fetch(url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + access_token
-        },
-        body: JSON.stringify(params)
-    });
-    const data = await response.json();
-    return await data;
-}
+// export const createNewPlaylist = async (access_token, userId) => {
+//     const params = {
+//         "name": "SpotifyQuickDiscover App Finds",
+//         "description": "Songs discovered through the SpotifyQuickDiscoverApp",
+//         "public": false
+//     }
+//     const url = `${endpoints.SpotifyAPIBaseURL}/users/${userId}/playlists`;
+//     const response = await fetch(url, {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json",
+//             "Authorization": "Bearer " + access_token
+//         },
+//         body: JSON.stringify(params)
+//     });
+//     const data = await response.json();
+//     return await data;
+// }
 
 
 
