@@ -1,11 +1,12 @@
 import { Button } from "@chakra-ui/button";
 import { Heading, Box } from "@chakra-ui/layout";
 import { Slider, SliderFilledTrack, SliderThumb, SliderTrack } from "@chakra-ui/slider";
-import { Text } from '@chakra-ui/react';
+import { Text, Image } from '@chakra-ui/react';
 import { TrackData } from "../../interfaces";
 import { useState } from "react";
 import Cookie from 'js-cookie';
 import { stringify } from "querystring";
+import endpointsConfig from "../../endpoints.config";
 
 interface Props {
     track: TrackData
@@ -59,11 +60,27 @@ const WebPlayer = ({ track }: Props) => {
         const data = await response.json();
     }
 
+    const addToPlaylist = async () => {
+        const trackToAdd = {
+            tracks: track.trackURI
+        }
+        // TODO: change all client side api calls to this format
+        const url = '/api/playlist/tracks?' + stringify(trackToAdd);
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                refresh_token: Cookie.get('refresh_token')
+            }
+        });
+        const data = await response.json();
+        console.log('add res: ', data);
+    }
+
     return (
         <>
             <div>
                 <Heading as='h4' size='lg' color='green.600'>{track.name}</Heading>
-                <img src={track.trackAlbumImage} />
+                <Image src={track.trackAlbumImage} />
             </div>
             <Box m="5px">
                 <Button colorScheme='green' size='sm' variant='solid' onClick={() => togglePlayback()}>{paused ? "PLAY" : "PAUSE"}</Button>
@@ -75,6 +92,7 @@ const WebPlayer = ({ track }: Props) => {
                     </SliderTrack>
                     <SliderThumb boxSize={6} />
                 </Slider>
+                {<Button onClick={() => addToPlaylist()}>Add</Button>}
             </Box>
         </>
     )

@@ -19,9 +19,10 @@ const PreviewStackDisplay = ({ dataList, changeTrack }: Props) => {
                 spacing={4}
                 align='center'
             >
-                {dataList.map((data) => (
+                {dataList.length > 0 ? (dataList.map((data) => (
                     <MusicPreviewPlayback trackData={data} changeTrack={changeTrack} key={data.trackURI} />
-                ))}
+                ))) : (<>Internal Server Error</>)}
+
             </VStack>
         </>
     )
