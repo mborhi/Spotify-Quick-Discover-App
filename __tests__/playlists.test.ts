@@ -1,4 +1,11 @@
-import { filterTracksToAdd } from "../utils/playlists";
+import { filterTracksToAdd, getUserQuickDiscoverPlaylist } from "../utils/playlists";
+
+describe("Add playlist", () => {
+
+    it("correctly adds a new playlist", () => {
+
+    });
+});
 
 describe("Filter tracks to add to playlist", () => {
     const playlistTracks = [{
@@ -35,4 +42,4 @@ describe("Filter tracks to add to playlist", () => {
         const tracksToAdd = filterTracksToAdd(trackUris, playlistTracks);
         expect(tracksToAdd).toEqual([]);
     });
-})
+});

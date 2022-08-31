@@ -11,6 +11,11 @@ const breakpoints = createBreakpoints({
 })
 
 const theme = extendTheme({
+  components: {
+    Image: {
+      boxSize: ['25rem', '30rem', '50rem']
+    }
+  },
   semanticTokens: {
     colors: {
       text: {
